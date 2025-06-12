@@ -22,3 +22,8 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "1.16.0"
+
+# This is the list of maintainers. This list should be updated each time a new member makes a change
+maintainers:
+  - name: Anton Bastin
+    email: Anton.Bastin@chirpwireless.io
