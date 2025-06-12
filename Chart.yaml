@@ -23,7 +23,7 @@ version: 0.1.0
 # It is recommended to use it with quotes.
 appVersion: "1.16.0"
 
-# This is the list of maintainers. This list should be updated each time a new member makes a change
+# This is the list of maintainers
 maintainers:
-  - name: Anton Bastin
-    email: Anton.Bastin@chirpwireless.io
+  - name: chirpwireless
+    url: https://github.com/chirpwireless
