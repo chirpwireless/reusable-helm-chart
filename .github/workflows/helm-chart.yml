@@ -83,7 +83,6 @@ jobs:
           extra_plugins: |
             @semantic-release/changelog
             @semantic-release/git
-            @semantic-release/github
         env:
           GITHUB_TOKEN: ${{ secrets.GH_CI_PASSWORD }}
 
