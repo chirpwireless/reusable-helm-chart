@@ -1,0 +1,1967 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "global": {
+      "type": "object",
+      "description": "Global configuration for the chart",
+      "required": [],
+      "properties": {
+        "metrics": {
+          "type": "object",
+          "description": "Enable metrics annotations for prometheus or scrape config for victoria metrics",
+          "required": [],
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable metrics annotations for prometheus or scrape config for victoria metrics",
+              "required": [],
+              "examples": [{ "enabled": false }]
+            },
+            "path": {
+              "type": "string",
+              "default": "/metrics",
+              "description": "Path for the metrics endpoint",
+              "required": [],
+              "examples": [{ "path": "/metrics" }]
+            },
+            "port": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "description": "Port for the metrics endpoint",
+              "required": [],
+              "examples": [{ "port": 80 }, { "port": "http" }]
+            },
+            "scrapeTimeout": {
+              "type": "string",
+              "default": "10s",
+              "description": "Scrape timeout for the metrics endpoint",
+              "required": [],
+              "examples": [{ "scrapeTimeout": "10s" }]
+            },
+            "interval": {
+              "type": "string",
+              "default": "60s",
+              "description": "Interval for the metrics endpoint",
+              "required": [],
+              "examples": [{ "interval": "60s" }]
+            }
+          },
+          "examples": [
+            {
+              "metrics": {
+                "enabled": true,
+                "path": "/metrics",
+                "port": "http",
+                "scrapeTimeout": "10s",
+                "interval": "60s"
+              }
+            }
+          ]
+        },
+        "imagePullSecrets": {
+          "type": "array",
+          "description": "Secrets to pull an image from a private container image registry or repository",
+          "required": [],
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "default": "",
+                "examples": [{ "name": "my-cool-secret" }]
+              }
+            },
+            "examples": [
+              {
+                "imagePullSecrets": [
+                  {
+                    "name": "my-cool-secret"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "rbac": {
+          "type": "object",
+          "description": "ClusterRole/Role and ClusterRoleBinding/RoleBinding configuration",
+          "required": [],
+          "properties": {
+            "create": {
+              "type": "boolean",
+              "default": false,
+              "description": "Create ClusterRole/Role and ClusterRoleBinding/RoleBinding",
+              "required": [],
+              "examples": [{ "create": true }]
+            },
+            "name": {
+              "type": "string",
+              "default": "{{ include 'reusable-helm-chart.fullname' . }}",
+              "description": "Name of the ClusterRole/Role and ClusterRoleBinding/RoleBinding",
+              "required": [],
+              "examples": [{ "name": "my-cool-name" }]
+            },
+            "namespaced": {
+              "type": "boolean",
+              "default": false,
+              "description": "If true - Role and RoleBinding will be created.\nIf false - ClusterRole and ClusterRoleBinding will be created",
+              "required": [],
+              "examples": [{ "namespaced": true }]
+            },
+            "aggregationRule": {
+              "type": "object",
+              "default": {},
+              "description": "You can aggregate several ClusterRoles into one combined ClusterRole",
+              "required": [],
+              "properties": {},
+              "examples": [
+                {
+                  "aggregationRule": {
+                    "clusterRoleSelectors": [
+                      {
+                        "matchLabels": {
+                          "rbac.authorization.k8s.io/aggregate-to-ignite-cache": "true"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "rules": {
+              "type": "array",
+              "description": "Represent a set of permissions. Permissions are purely additive (there are no \"deny\" rules).",
+              "required": [],
+              "items": {
+                "type": "object",
+                "required": ["verbs", "apiGroups", "resources"],
+                "properties": {
+                  "verbs": {
+                    "type": "array",
+                    "default": "",
+                    "required": [],
+                    "examples": [{ "verbs": ["get", "list", "watch"] }]
+                  },
+                  "apiGroups": {
+                    "type": "array",
+                    "default": "",
+                    "required": [],
+                    "examples": [{ "apiGroups": ["stable.example.com"] }]
+                  },
+                  "resources": {
+                    "type": "array",
+                    "default": "",
+                    "required": [],
+                    "examples": [{ "resources": ["pods", "endpoints"] }]
+                  }
+                },
+                "examples": [
+                  {
+                    "rules": {
+                      "verbs": ["get", "list", "watch"],
+                      "apiGroups": ["stable.example.com"],
+                      "resources": ["pods", "endpoints"]
+                    }
+                  }
+                ]
+              }
+            },
+            "annotations": {
+              "type": "object",
+              "description": "Kubernetes annotations for the ClusterRole/Role and ClusterRoleBinding/RoleBinding",
+              "required": [],
+              "properties": {},
+              "examples": []
+            }
+          },
+          "examples": [
+            {
+              "rbac": {
+                "create": true,
+                "aggregationRule": {
+                  "clusterRoleSelectors": [
+                    {
+                      "matchLabels": {
+                        "rbac.authorization.k8s.io/aggregate-to-ignite-cache": "true"
+                      }
+                    }
+                  ]
+                },
+                "rules": {
+                  "verbs": ["get", "list", "watch"],
+                  "apiGroups": [""],
+                  "resources": ["pods", "endpoints"]
+                },
+                "annotations": {}
+              }
+            }
+          ]
+        },
+        "serviceAccount": {
+          "type": "object",
+          "description": "The serviceAccount Schema",
+          "required": [],
+          "properties": {
+            "create": {
+              "type": "boolean",
+              "default": false,
+              "description": "Create a Service Account",
+              "required": [],
+              "examples": [{ "create": true }]
+            },
+            "annotations": {
+              "type": "object",
+              "description": "Kubernetes annotations for the Service Account",
+              "required": [],
+              "properties": {},
+              "examples": []
+            },
+            "name": {
+              "type": "string",
+              "default": "",
+              "description": "The name of the service account to use. If not set and create is true, a name is generated using the fullname template",
+              "required": [],
+              "examples": [{ "name": "my-cool-sa-name" }]
+            }
+          },
+          "examples": [
+            {
+              "serviceAccount": {
+                "create": true,
+                "annotations": {},
+                "name": "my-cool-sa-name"
+              }
+            }
+          ]
+        }
+      },
+      "examples": [
+        {
+          "global": {
+            "metrics": {
+              "enabled": true,
+              "path": "/metrics",
+              "port": "http",
+              "scrapeTimeout": "10s",
+              "interval": "60s"
+            },
+            "imagePullSecrets": [
+              {
+                "name": "my-cool-secret"
+              }
+            ],
+            "rbac": {
+              "create": true,
+              "aggregationRule": {
+                "clusterRoleSelectors": [
+                  {
+                    "matchLabels": {
+                      "rbac.authorization.k8s.io/aggregate-to-ignite-cache": "true"
+                    }
+                  }
+                ]
+              },
+              "rules": {
+                "verbs": ["get", "list", "watch"],
+                "apiGroups": [""],
+                "resources": ["pods", "endpoints"]
+              },
+              "annotations": {}
+            },
+            "serviceAccount": {
+              "create": true,
+              "annotations": {},
+              "name": "my-cool-sa-name"
+            }
+          }
+        }
+      ]
+    },
+    "deployment": {
+      "type": "object",
+      "description": "The Deployment configuration for the chart",
+      "required": [],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Can't be true together with statefulset.enabled: true",
+          "required": [],
+          "examples": [{ "enabled": false }]
+        },
+        "strategy": {
+          "type": "object",
+          "description": "Kubernetes deployment strategy configuration",
+          "required": [],
+          "properties": {},
+          "examples": [
+            {
+              "strategy": {
+                "type": "RollingUpdate"
+              }
+            }
+          ]
+        }
+      },
+      "examples": [
+        {
+          "deployment": {
+            "enabled": true,
+            "strategy": {
+              "type": "RollingUpdate"
+            }
+          }
+        }
+      ]
+    },
+    "statefulset": {
+      "type": "object",
+      "description": "The Statefulset configuration for the chart",
+      "required": [],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Can't be true together with deployment.enabled: true",
+          "required": [],
+          "examples": [{ "enabled": true }]
+        }
+      },
+      "examples": [
+        {
+          "statefulset": {
+            "enabled": true
+          }
+        }
+      ]
+    },
+    "nameOverride": {
+      "type": "string",
+      "default": "",
+      "description": "Replaces the name of the chart in the Chart.yaml file",
+      "required": [],
+      "examples": [{ "nameOverride": "my-cool-name" }]
+    },
+    "fullnameOverride": {
+      "type": "string",
+      "default": "",
+      "description": "Completely replaces the generated name",
+      "required": [],
+      "examples": [{ "fullnameOverride": "my-cool-name" }]
+    },
+    "replicaCount": {
+      "type": "integer",
+      "default": 2,
+      "minimum": 1,
+      "description": "The replicaCount Schema",
+      "required": [],
+      "examples": [{ "replicaCount": 1 }]
+    },
+    "image": {
+      "type": "object",
+      "description": "The Image configuration for application",
+      "required": ["repository"],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "default": "gcr.io/google_containers/echoserver",
+          "description": "Full image URL",
+          "required": [],
+          "examples": [{ "repository": "gcr.io/google_containers/echoserver" }]
+        },
+        "pullPolicy": {
+          "type": "string",
+          "default": "IfNotPresent",
+          "pattern": "^(Always|Never|IfNotPresent)$",
+          "description": "The pullPolicy Schema",
+          "required": [],
+          "examples": [{ "pullPolicy": "Always" }]
+        }
+      },
+      "examples": [
+        {
+          "image": {
+            "repository": "gcr.io/google_containers/echoserver",
+            "pullPolicy": "IfNotPresent"
+          }
+        }
+      ]
+    },
+    "extraEnv": {
+      "$ref": "#/$defs/extraEnv"
+    },
+    "extraConfigMap": {
+      "$ref": "#/$defs/extraConfigMap"
+    },
+    "extraEnvFrom": {
+      "$ref": "#/$defs/extraEnvFrom"
+    },
+    "extraMemoryMount": {
+      "$ref": "#/$defs/extraMemoryMount"
+    },
+    "initContainers": {
+      "type": "array",
+      "description": "List of init containers for the application",
+      "required": ["command"],
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": "",
+            "description": "Name of the init container",
+            "required": [],
+            "examples": [{ "name": "my-init-container" }]
+          },
+          "image": {
+            "type": "object",
+            "description": "The Image configuration for init container",
+            "required": [],
+            "properties": {
+              "repository": {
+                "type": "string",
+                "default": "gcr.io/google_containers/echoserver",
+                "description": "Full image URL",
+                "required": [],
+                "examples": [
+                  { "repository": "gcr.io/google_containers/echoserver" }
+                ]
+              },
+              "pullPolicy": {
+                "type": "string",
+                "default": "IfNotPresent",
+                "pattern": "^(Always|Never|IfNotPresent)$",
+                "description": "The pullPolicy Schema",
+                "required": [],
+                "examples": [{ "pullPolicy": "Always" }]
+              },
+              "tag": {
+                "type": "string",
+                "default": "",
+                "description": "The image tag",
+                "required": [],
+                "examples": [{ "tag": "latest" }]
+              }
+            },
+            "examples": [
+              {
+                "image": {
+                  "repository": "gcr.io/google_containers/echoserver",
+                  "pullPolicy": "IfNotPresent",
+                  "tag": "latest"
+                }
+              }
+            ]
+          },
+          "command": {
+            "type": "string",
+            "default": "",
+            "description": "Command for init container",
+            "required": [],
+            "examples": [{ "command": "/bin/sh -c 'echo Hello World'" }]
+          },
+          "extraEnv": {
+            "$ref": "#/$defs/extraEnv"
+          },
+          "extraEnvFrom": {
+            "$ref": "#/$defs/extraEnvFrom"
+          },
+          "extraConfigMap": {
+            "$ref": "#/$defs/extraConfigMap"
+          },
+          "extraMemoryMount": {
+            "$ref": "#/$defs/extraMemoryMount"
+          }
+        },
+        "examples": [
+          {
+            "initContainers": [
+              {
+                "name": "my-init-container",
+                "image": {
+                  "repository": "gcr.io/google_containers/echoserver",
+                  "pullPolicy": "IfNotPresent",
+                  "tag": "latest"
+                },
+                "command": "/bin/sh -c 'echo Hello World'",
+                "extraEnvFrom": [
+                  {
+                    "configMapRef": {
+                      "name": "FOO"
+                    }
+                  },
+                  {
+                    "secretRef": {
+                      "name": "FOO"
+                    }
+                  }
+                ],
+                "extraConfigMap": {
+                  "name": "FOO",
+                  "mountPath": "/mount/path/to/folder",
+                  "subPath": "/if/needed",
+                  "data": { "key1": "value1", "key2": "value2" }
+                },
+                "extraMemoryMounts": [
+                  {
+                    "name": "FOO",
+                    "mountPath": "/mount/path/to",
+                    "subPath": "/if/needed",
+                    "sizeLimit": "500Mi"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "command": {
+      "type": "string",
+      "default": "/bin/sh -c 'echo Hello World'",
+      "description": "Command for application container",
+      "required": [],
+      "examples": [{ "command": "/bin/sh -c 'echo Hello World'" }]
+    },
+    "podAnnotations": {
+      "type": "object",
+      "description": "Annotations object for application",
+      "required": [],
+      "properties": {},
+      "examples": [
+        {
+          "podAnnotations": {
+            "application.framework": "golang"
+          }
+        }
+      ]
+    },
+    "podSecurityContext": {
+      "type": "object",
+      "description": "Security context for the whole deployment",
+      "required": [],
+      "properties": {},
+      "examples": [
+        {
+          "podSecurityContext": {
+            "fsGroup": "2000"
+          }
+        }
+      ]
+    },
+    "securityContext": {
+      "type": "object",
+      "description": "Security context for the application container",
+      "required": [],
+      "properties": {},
+      "examples": [
+        {
+          "securityContext": {
+            "capabilities": {
+              "drop": ["ALL"]
+            },
+            "readOnlyRootFilesystem": "true",
+            "runAsNonRoot": "true",
+            "runAsUser": "1000"
+          }
+        }
+      ]
+    },
+    "service": {
+      "type": "object",
+      "description": "Service configuration for the application",
+      "required": [],
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "ClusterIP",
+          "description": "Service type",
+          "required": [],
+          "examples": [{ "type": "ClusterIP" }]
+        },
+        "ports": {
+          "type": "array",
+          "description": "Service ports",
+          "required": ["port", "targetPort", "name"],
+          "items": {
+            "type": "object",
+            "properties": {
+              "port": {
+                "type": "integer",
+                "default": 80,
+                "description": "Service port",
+                "required": [],
+                "examples": [{ "port": 80 }]
+              },
+              "targetPort": {
+                "type": "integer",
+                "default": 8080,
+                "description": "Target port",
+                "required": [],
+                "examples": [{ "targetPort": 8080 }]
+              },
+              "name": {
+                "type": "string",
+                "default": "http",
+                "description": "Name of the port",
+                "required": [],
+                "examples": [{ "name": "http" }]
+              }
+            },
+            "examples": [
+              {
+                "ports": [
+                  {
+                    "port": 80,
+                    "targetPort": 8080,
+                    "name": "http"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "examples": [
+        {
+          "service": {
+            "type": "ClusterIP",
+            "ports": [
+              {
+                "port": 80,
+                "targetPort": 8080,
+                "name": "http"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "cronjob": {
+      "type": "array",
+      "description": "Cronjob list",
+      "required": ["command"],
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": "",
+            "description": "Name of the cronjob",
+            "required": [],
+            "examples": [{ "name": "cronjob-name" }]
+          },
+          "image": {
+            "type": "object",
+            "description": "The Image configuration for Cronjob container",
+            "required": [],
+            "properties": {
+              "repository": {
+                "type": "string",
+                "default": "",
+                "description": "Full image URL",
+                "required": [],
+                "examples": [
+                  { "repository": "gcr.io/google_containers/echoserver" }
+                ]
+              },
+              "pullPolicy": {
+                "type": "string",
+                "default": "IfNotPresent",
+                "pattern": "^(Always|Never|IfNotPresent)$",
+                "description": "The pullPolicy Schema",
+                "required": [],
+                "examples": [{ "pullPolicy": "Always" }]
+              },
+              "tag": {
+                "type": "string",
+                "default": "",
+                "description": "The image tag",
+                "required": [],
+                "examples": [{ "tag": "latest" }]
+              }
+            },
+            "examples": [
+              {
+                "image": {
+                  "repository": "gcr.io/google_containers/echoserver",
+                  "pullPolicy": "IfNotPresent",
+                  "tag": "latest"
+                }
+              }
+            ]
+          },
+          "command": {
+            "type": "string",
+            "default": "",
+            "description": "Command for cronjob pod",
+            "required": [],
+            "examples": [{ "command": "my-command.sh" }]
+          },
+          "schedule": {
+            "type": "string",
+            "default": "",
+            "description": "Schedule for cronjob pod",
+            "required": [],
+            "examples": [{ "schedule": "0 0 * * 0" }]
+          },
+          "successfulJobsHistoryLimit": {
+            "type": "integer",
+            "default": 1,
+            "description": "Number of successful pods to be kept",
+            "required": [],
+            "examples": [{ "successfulJobsHistoryLimit": 1 }]
+          },
+          "failedJobsHistoryLimit": {
+            "type": "integer",
+            "default": 3,
+            "description": "Number of failed pods to be kept",
+            "required": [],
+            "examples": [{ "failedJobsHistoryLimit": 3 }]
+          },
+          "extraEnv": {
+            "$ref": "#/$defs/extraEnv"
+          },
+          "extraEnvFrom": {
+            "$ref": "#/$defs/extraEnvFrom"
+          },
+          "extraConfigMap": {
+            "$ref": "#/$defs/extraConfigMap"
+          },
+          "extraMemoryMount": {
+            "$ref": "#/$defs/extraMemoryMount"
+          },
+          "initContainers": {
+            "type": "array",
+            "description": "List of init containers for the application",
+            "required": ["command"],
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "default": "",
+                  "description": "Name of the init container",
+                  "required": [],
+                  "examples": [{ "name": "my-init-container" }]
+                },
+                "image": {
+                  "type": "object",
+                  "description": "The Image configuration for init container",
+                  "required": [],
+                  "properties": {
+                    "repository": {
+                      "type": "string",
+                      "default": "",
+                      "description": "Full image URL",
+                      "required": [],
+                      "examples": [
+                        { "repository": "gcr.io/google_containers/echoserver" }
+                      ]
+                    },
+                    "pullPolicy": {
+                      "type": "string",
+                      "default": "IfNotPresent",
+                      "pattern": "^(Always|Never|IfNotPresent)$",
+                      "description": "The pullPolicy Schema",
+                      "required": [],
+                      "examples": [{ "pullPolicy": "Always" }]
+                    },
+                    "tag": {
+                      "type": "string",
+                      "default": "",
+                      "description": "The image tag",
+                      "required": [],
+                      "examples": [{ "tag": "latest" }]
+                    }
+                  },
+                  "examples": [
+                    {
+                      "image": {
+                        "repository": "gcr.io/google_containers/echoserver",
+                        "pullPolicy": "IfNotPresent",
+                        "tag": "latest"
+                      }
+                    }
+                  ]
+                },
+                "command": {
+                  "type": "string",
+                  "default": "",
+                  "description": "Command for init container",
+                  "required": [],
+                  "examples": [{ "command": "/bin/sh -c 'echo Hello World'" }]
+                },
+                "extraEnv": {
+                  "$ref": "#/$defs/extraEnv"
+                },
+                "extraEnvFrom": {
+                  "$ref": "#/$defs/extraEnvFrom"
+                },
+                "extraConfigMap": {
+                  "$ref": "#/$defs/extraConfigMap"
+                },
+                "extraMemoryMount": {
+                  "$ref": "#/$defs/extraMemoryMount"
+                }
+              },
+              "examples": [
+                {
+                  "initContainers": [
+                    {
+                      "name": "my-init-container",
+                      "image": {
+                        "repository": "gcr.io/google_containers/echoserver",
+                        "pullPolicy": "IfNotPresent",
+                        "tag": "latest"
+                      },
+                      "command": "/bin/sh -c 'echo Hello World'",
+                      "extraEnvFrom": [
+                        {
+                          "configMapRef": {
+                            "name": "FOO"
+                          }
+                        },
+                        {
+                          "secretRef": {
+                            "name": "FOO"
+                          }
+                        }
+                      ],
+                      "extraConfigMap": {
+                        "name": "FOO",
+                        "mountPath": "/mount/path/to/folder",
+                        "subPath": "/if/needed",
+                        "data": { "key1": "value1", "key2": "value2" }
+                      },
+                      "extraMemoryMounts": [
+                        {
+                          "name": "FOO",
+                          "mountPath": "/mount/path/to",
+                          "subPath": "/if/needed",
+                          "sizeLimit": "500Mi"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "podAnnotations": {
+            "type": "object",
+            "description": "Annotations object",
+            "required": [],
+            "properties": {},
+            "examples": [
+              {
+                "podAnnotations": {}
+              }
+            ]
+          },
+          "nodeSelector": {
+            "type": "object",
+            "description": "NodeSelector object",
+            "required": [],
+            "properties": {},
+            "examples": [
+              {
+                "nodeSelector": {}
+              }
+            ]
+          }
+        }
+      },
+      "examples": [
+        {
+          "cronjob": {
+            "name": "cronjob-name",
+            "image": {
+              "repository": "gcr.io/google_containers/echoserver",
+              "pullPolicy": "IfNotPresent",
+              "tag": "latest"
+            },
+            "command": "my-command.sh",
+            "extraEnv": [{ "name": "FOO", "value": "BAR" }],
+            "extraEnvFrom": [
+              {
+                "configMapRef": {
+                  "name": "FOO"
+                }
+              },
+              {
+                "secretRef": {
+                  "name": "FOO"
+                }
+              }
+            ],
+            "extraConfigMap": {
+              "name": "FOO",
+              "mountPath": "/mount/path/to/folder",
+              "subPath": "/if/needed",
+              "data": {
+                "key1": "value1",
+                "key2": "value2"
+              }
+            },
+            "extraMemoryMount": [
+              {
+                "name": "FOO",
+                "mountPath": "/mount/path/to",
+                "subPath": "/if/needed",
+                "sizeLimit": "500Mi"
+              }
+            ],
+            "podAnnotations": {},
+            "nodeSelector": {}
+          }
+        }
+      ]
+    },
+    "ingress": {
+      "type": "object",
+      "description": "Ingress for the application",
+      "required": [],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Ingress",
+          "required": [],
+          "examples": [{ "enabled": true }]
+        },
+        "className": {
+          "type": "string",
+          "default": "",
+          "description": "Ingress ClassName",
+          "required": [],
+          "examples": [{ "className": "nginx" }]
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Kubernetes annotations for the Ingress",
+          "required": [],
+          "properties": {},
+          "examples": []
+        },
+        "hosts": {
+          "type": "array",
+          "description": "Hosts configuration for Ingress",
+          "required": [],
+          "items": {
+            "type": "object",
+            "required": ["host", "paths"],
+            "properties": {
+              "host": {
+                "type": "string",
+                "default": "",
+                "description": "Ingress host",
+                "required": [],
+                "examples": [{ "host": "chart-example.local" }]
+              },
+              "paths": {
+                "type": "array",
+                "description": "Paths configuration for Ingress",
+                "required": [],
+                "items": {
+                  "type": "object",
+                  "required": ["path", "pathType"],
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "default": "",
+                      "description": "Host path",
+                      "required": [],
+                      "examples": [{ "path": "/" }]
+                    },
+                    "pathType": {
+                      "type": "string",
+                      "default": "",
+                      "description": "Host pathType",
+                      "required": [],
+                      "examples": [{ "pathType": "ImplementationSpecific" }]
+                    }
+                  }
+                },
+                "examples": [
+                  {
+                    "paths": [
+                      {
+                        "path": "/",
+                        "pathType": "ImplementationSpecific"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "examples": [
+            {
+              "hosts": [
+                {
+                  "host": "chart-example.local",
+                  "paths": [
+                    {
+                      "path": "/",
+                      "pathType": "ImplementationSpecific"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "tls": {
+          "type": "array",
+          "description": "TLS configuration for Ingress",
+          "required": [],
+          "items": {
+            "type": "object",
+            "required": ["secretName", "hosts"],
+            "properties": {
+              "secretName": {
+                "type": "string",
+                "default": "",
+                "description": "Name of the secret with certificate",
+                "required": [],
+                "examples": [{ "secretName": "chart-example-tls" }]
+              },
+              "hosts": {
+                "type": "array",
+                "description": "Hosts configuration for Ingress TLS",
+                "required": [],
+                "items": {
+                  "type": "string",
+                  "default": "",
+                  "description": "Hosts for Ingress TLS",
+                  "required": [],
+                  "examples": ["chart-example.local"]
+                },
+                "examples": [
+                  {
+                    "hosts": ["chart-example.local"]
+                  }
+                ]
+              }
+            }
+          },
+          "examples": [
+            {
+              "tls": [
+                {
+                  "secretName": "chart-example-tls",
+                  "hosts": ["chart-example.local"]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "examples": [
+        {
+          "ingress": {
+            "enabled": true,
+            "className": "nginx",
+            "annotations": {},
+            "hosts": [
+              {
+                "host": "chart-example.local",
+                "paths": [
+                  {
+                    "path": "/",
+                    "pathType": "ImplementationSpecific"
+                  }
+                ]
+              }
+            ],
+            "tls": [
+              {
+                "secretName": "chart-example-tls",
+                "hosts": ["chart-example.local"]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "resources": {
+      "type": "object",
+      "description": "Resources for the application",
+      "required": [],
+      "properties": {
+        "limits": {
+          "type": "object",
+          "description": "Resources limits for the application",
+          "required": [],
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "default": "",
+              "description": "CPU limits",
+              "required": [],
+              "examples": [{ "cpu": "1000m" }]
+            },
+            "memory": {
+              "type": "string",
+              "default": "2000Mi",
+              "description": "Memory limits",
+              "required": [],
+              "examples": [{ "memory": "2000Mi" }]
+            }
+          },
+          "examples": [
+            {
+              "limits": {
+                "cpu": "1000m",
+                "memory": "2000Mi"
+              }
+            }
+          ]
+        },
+        "requests": {
+          "type": "object",
+          "description": "Resources requests for the application",
+          "required": [],
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "default": "100m",
+              "description": "CPU requests",
+              "required": [],
+              "examples": [{ "cpu": "100m" }]
+            },
+            "memory": {
+              "type": "string",
+              "default": "1000Mi",
+              "description": "Memory requests",
+              "required": [],
+              "examples": [{ "memory": "1000Mi" }]
+            }
+          },
+          "examples": [
+            {
+              "requests": {
+                "cpu": "100m",
+                "memory": "650Mi"
+              }
+            }
+          ]
+        }
+      },
+      "examples": [
+        {
+          "resources": {
+            "limits": {
+              "cpu": "1000m",
+              "memory": "2000Mi"
+            },
+            "requests": {
+              "cpu": "100m",
+              "memory": "650Mi"
+            }
+          }
+        }
+      ]
+    },
+    "startupProbe": {
+      "type": "object",
+      "description": "StartupProbe for the application",
+      "required": [],
+      "properties": {
+        "failureThreshold": {
+          "type": "integer",
+          "default": 30,
+          "minimum": 1,
+          "description": "",
+          "required": [],
+          "examples": [{ "failureThreshold": 30 }]
+        },
+        "periodSeconds": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "description": "",
+          "required": [],
+          "examples": [{ "periodSeconds": 10 }]
+        },
+        "httpGet": {
+          "type": "object",
+          "description": "HTTP application endpoint",
+          "required": [],
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path for the endpoint",
+              "required": [],
+              "examples": [{ "path": "/health" }]
+            },
+            "port": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "description": "Port for the endpoint",
+              "required": [],
+              "examples": [{ "port": 8080 }, { "port": "http" }]
+            },
+            "scheme": {
+              "type": "string",
+              "pattern": "^(HTTP|HTTPS)$",
+              "description": "Scheme for the endpoint",
+              "required": [],
+              "examples": [{ "scheme": "HTTP" }]
+            }
+          },
+          "examples": [
+            {
+              "httpGet": {
+                "path": "/health",
+                "port": 8080,
+                "scheme": "HTTP"
+              }
+            }
+          ]
+        },
+        "grpc": {
+          "type": "object",
+          "description": "gRPC application endpoint",
+          "required": [],
+          "properties": {
+            "port": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "description": "Port for the gRPC endpoint",
+              "required": [],
+              "examples": [{ "port": 8080 }, { "port": "grpc" }]
+            },
+            "service": {
+              "type": "string",
+              "description": "Service name for the gRPC health check (optional)",
+              "required": [],
+              "examples": [{ "service": "my.service.name" }]
+            }
+          },
+          "examples": [
+            {
+              "grpc": {
+                "port": 8080,
+                "service": "my.service.name"
+              }
+            }
+          ]
+        }
+      },
+      "examples": [
+        {
+          "startupProbe": {
+            "failureThreshold": 30,
+            "periodSeconds": 10,
+            "httpGet": {
+              "path": "/health",
+              "port": 8080,
+              "scheme": "HTTP"
+            }
+          }
+        }
+      ]
+    },
+    "livenessProbe": {
+      "type": "object",
+      "description": "LivenessProbe for the application",
+      "required": [],
+      "properties": {
+        "failureThreshold": {
+          "type": "integer",
+          "default": 5,
+          "minimum": 1,
+          "description": "",
+          "required": [],
+          "examples": [{ "failureThreshold": 5 }]
+        },
+        "initialDelaySeconds": {
+          "type": "integer",
+          "default": 0,
+          "minimum": 0,
+          "description": "",
+          "required": [],
+          "examples": [{ "initialDelaySeconds": 0 }]
+        },
+        "periodSeconds": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "description": "",
+          "required": [],
+          "examples": [{ "periodSeconds": 10 }]
+        },
+        "successThreshold": {
+          "type": "integer",
+          "default": 1,
+          "minimum": 1,
+          "description": "",
+          "required": [],
+          "examples": [{ "successThreshold": 1 }]
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "default": 1,
+          "minimum": 1,
+          "description": "",
+          "required": [],
+          "examples": [{ "timeoutSeconds": 1 }]
+        },
+        "httpGet": {
+          "type": "object",
+          "description": "HTTP application endpoint",
+          "required": [],
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path for the endpoint",
+              "required": [],
+              "examples": [{ "path": "/health" }]
+            },
+            "port": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "description": "Port for the endpoint",
+              "required": [],
+              "examples": [{ "port": 8080 }, { "port": "http" }]
+            },
+            "scheme": {
+              "type": "string",
+              "pattern": "^(HTTP|HTTPS)$",
+              "description": "Scheme for the endpoint",
+              "required": [],
+              "examples": [{ "scheme": "HTTP" }]
+            }
+          },
+          "examples": [
+            {
+              "httpGet": {
+                "path": "/health",
+                "port": 8080,
+                "scheme": "HTTP"
+              }
+            }
+          ]
+        },
+        "grpc": {
+          "type": "object",
+          "description": "gRPC application endpoint",
+          "required": [],
+          "properties": {
+            "port": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "description": "Port for the gRPC endpoint",
+              "required": [],
+              "examples": [{ "port": 8080 }, { "port": "grpc" }]
+            },
+            "service": {
+              "type": "string",
+              "description": "Service name for the gRPC health check (optional)",
+              "required": [],
+              "examples": [{ "service": "my.service.name" }]
+            }
+          },
+          "examples": [
+            {
+              "grpc": {
+                "port": 8080,
+                "service": "my.service.name"
+              }
+            }
+          ]
+        }
+      },
+      "examples": [
+        {
+          "livenessProbe": {
+            "failureThreshold": 5,
+            "initialDelaySeconds": 0,
+            "periodSeconds": 10,
+            "successThreshold": 1,
+            "timeoutSeconds": 1,
+            "httpGet": {
+              "path": "/health",
+              "port": 8080,
+              "scheme": "HTTP"
+            }
+          }
+        }
+      ]
+    },
+    "readinessProbe": {
+      "type": "object",
+      "description": "ReadinessProbe for the application",
+      "required": [],
+      "properties": {
+        "failureThreshold": {
+          "type": "integer",
+          "default": 5,
+          "minimum": 1,
+          "description": "",
+          "required": [],
+          "examples": [{ "failureThreshold": 5 }]
+        },
+        "initialDelaySeconds": {
+          "type": "integer",
+          "default": 0,
+          "minimum": 0,
+          "description": "",
+          "required": [],
+          "examples": [{ "initialDelaySeconds": 0 }]
+        },
+        "periodSeconds": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "description": "",
+          "required": [],
+          "examples": [{ "periodSeconds": 10 }]
+        },
+        "successThreshold": {
+          "type": "integer",
+          "default": 1,
+          "minimum": 1,
+          "description": "",
+          "required": [],
+          "examples": [{ "successThreshold": 1 }]
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "default": 1,
+          "minimum": 1,
+          "description": "",
+          "required": [],
+          "examples": [{ "timeoutSeconds": 1 }]
+        },
+        "httpGet": {
+          "type": "object",
+          "description": "HTTP application endpoint",
+          "required": [],
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path for the endpoint",
+              "required": [],
+              "examples": [{ "path": "/health" }]
+            },
+            "port": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "description": "Port for the endpoint",
+              "required": [],
+              "examples": [{ "port": 8080 }, { "port": "http" }]
+            },
+            "scheme": {
+              "type": "string",
+              "pattern": "^(HTTP|HTTPS)$",
+              "description": "Scheme for the endpoint",
+              "required": [],
+              "examples": [{ "scheme": "HTTP" }]
+            }
+          },
+          "examples": [
+            {
+              "httpGet": {
+                "path": "/health",
+                "port": 8080,
+                "scheme": "HTTP"
+              }
+            }
+          ]
+        },
+        "grpc": {
+          "type": "object",
+          "description": "gRPC application endpoint",
+          "required": [],
+          "properties": {
+            "port": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "description": "Port for the gRPC endpoint",
+              "required": [],
+              "examples": [{ "port": 8080 }, { "port": "grpc" }]
+            },
+            "service": {
+              "type": "string",
+              "description": "Service name for the gRPC health check (optional)",
+              "required": [],
+              "examples": [{ "service": "my.service.name" }]
+            }
+          },
+          "examples": [
+            {
+              "grpc": {
+                "port": 8080,
+                "service": "my.service.name"
+              }
+            }
+          ]
+        }
+      },
+      "examples": [
+        {
+          "readinessProbe": {
+            "failureThreshold": 5,
+            "initialDelaySeconds": 0,
+            "periodSeconds": 10,
+            "successThreshold": 1,
+            "timeoutSeconds": 1,
+            "httpGet": {
+              "path": "/health",
+              "port": 8080,
+              "scheme": "HTTP"
+            }
+          }
+        }
+      ]
+    },
+    "autoscaling": {
+      "type": "object",
+      "description": "Autoscaling for the application",
+      "required": [],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Autoscaling",
+          "required": [],
+          "examples": [{ "enabled": true }]
+        },
+        "minReplicas": {
+          "type": "integer",
+          "default": 2,
+          "minimum": 1,
+          "description": "Minimum number of replicas for an application",
+          "required": [],
+          "examples": [{ "minReplicas": 1 }]
+        },
+        "maxReplicas": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "description": "Maximum number of replicas for an application",
+          "required": [],
+          "examples": [{ "maxReplicas": 1 }]
+        },
+        "targetCPUUtilizationPercentage": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "description": "CPU Utilisaztion in percent for scaling",
+          "required": [],
+          "examples": [{ "targetCPUUtilizationPercentage": 80 }]
+        },
+        "targetMemoryUtilizationPercentage": {
+          "type": "integer",
+          "default": 80,
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Memory Utilisaztion in percent for scaling",
+          "required": [],
+          "examples": [{ "targetMemoryUtilizationPercentage": 80 }]
+        }
+      },
+      "examples": [
+        {
+          "autoscaling": {
+            "minReplicas": 1,
+            "maxReplicas": 1,
+            "targetCPUUtilizationPercentage": 80,
+            "targetMemoryUtilizationPercentage": 80
+          }
+        }
+      ]
+    },
+    "nodeSelector": {
+      "type": "object",
+      "description": "NodeSelector for the application",
+      "required": [],
+      "properties": {},
+      "examples": [{}]
+    },
+    "tolerations": {
+      "type": "array",
+      "description": "Tolerations for the application",
+      "required": [],
+      "items": {},
+      "examples": [{}]
+    }
+  },
+  "examples": [
+    {
+      "global": {
+        "metrics": {
+          "enabled": true,
+          "path": "/metrics",
+          "port": "http",
+          "scrapeTimeout": "10s",
+          "interval": "60s"
+        },
+        "imagePullSecrets": [],
+        "rbac": {
+          "create": false,
+          "name": "{{ include \"tvpp-helm-chart.fullname\" . }}",
+          "namespaced": false,
+          "aggregationRule": {},
+          "rules": {},
+          "annotations": {}
+        },
+        "serviceAccount": {
+          "create": false,
+          "annotations": {},
+          "name": ""
+        }
+      },
+      "deployment": {
+        "enabled": true,
+        "strategy": {
+          "type": "RollingUpdate"
+        }
+      },
+      "statefulset": {
+        "enabled": false
+      },
+      "nameOverride": "",
+      "fullnameOverride": "",
+      "replicaCount": 2,
+      "image": {
+        "repository": "gcr.io/google_containers/echoserver",
+        "pullPolicy": "IfNotPresent"
+      },
+      "extraEnv": [],
+      "extraConfigMap": [],
+      "extraEnvFrom": [],
+      "extraMemoryMount": [],
+      "command": "/bin/sh -c 'echo Hello World'",
+      "podAnnotations": {
+        "application.framework": "golang"
+      },
+      "podSecurityContext": {},
+      "securityContext": {},
+      "service": {
+        "type": "ClusterIP",
+        "ports": [
+          {
+            "port": 80,
+            "targetPort": 8080,
+            "name": "http"
+          }
+        ]
+      },
+      "cronjob": [],
+      "ingress": {
+        "enabled": false,
+        "className": "",
+        "annotations": {},
+        "hosts": [],
+        "tls": []
+      },
+      "resources": {
+        "limits": {
+          "memory": "2000Mi"
+        },
+        "requests": {
+          "cpu": "100m",
+          "memory": "650Mi"
+        }
+      },
+      "startupProbe": {
+        "failureThreshold": 30,
+        "periodSeconds": 10,
+        "httpGet": {
+          "path": "/health",
+          "port": 8080,
+          "scheme": "HTTP"
+        }
+      },
+      "livenessProbe": {
+        "failureThreshold": 5,
+        "initialDelaySeconds": 0,
+        "periodSeconds": 10,
+        "successThreshold": 1,
+        "timeoutSeconds": 1,
+        "httpGet": {
+          "path": "/health",
+          "port": 8080,
+          "scheme": "HTTP"
+        }
+      },
+      "readinessProbe": {
+        "failureThreshold": 5,
+        "initialDelaySeconds": 0,
+        "periodSeconds": 10,
+        "successThreshold": 1,
+        "timeoutSeconds": 1,
+        "httpGet": {
+          "path": "/health",
+          "port": 8080,
+          "scheme": "HTTP"
+        }
+      },
+      "autoscaling": {
+        "enabled": false,
+        "minReplicas": 2,
+        "maxReplicas": 10,
+        "targetMemoryUtilizationPercentage": 80
+      },
+      "nodeSelector": {},
+      "tolerations": []
+    }
+  ],
+  "$defs": {
+    "extraEnv": {
+      "type": "array",
+      "description": "Extra environment variables to be set",
+      "required": [],
+      "items": {
+        "type": "object",
+        "required": ["name", "value"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": "",
+            "description": "Environment variable name",
+            "required": [],
+            "examples": [{ "name": "FOO" }]
+          },
+          "value": {
+            "type": "string",
+            "default": "",
+            "description": "Environment variable value",
+            "required": [],
+            "examples": [{ "value": "BAR" }]
+          }
+        },
+        "examples": [
+          {
+            "extraEnv": [{ "name": "FOO", "value": "BAR" }]
+          }
+        ]
+      }
+    },
+    "extraConfigMap": {
+      "type": "array",
+      "description": "Extra configmaps to be set",
+      "required": [],
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": "",
+            "description": "ConfigMap name suffix",
+            "required": [],
+            "examples": [{ "name": "FOO" }]
+          },
+          "mountPath": {
+            "type": "string",
+            "default": "",
+            "description": "Where the ConfigMap should be mounted",
+            "required": [],
+            "examples": [{ "mountPath": "/mount/path/to/folder" }]
+          },
+          "subPath": {
+            "type": "string",
+            "default": "",
+            "description": "SubPath for the mount",
+            "required": [],
+            "examples": [{ "subPath": "/if/needed" }]
+          },
+          "data": {
+            "type": "object",
+            "description": "Data to populate the ConfigMap",
+            "required": [],
+            "properties": {},
+            "examples": [
+              {
+                "data": {
+                  "key": "value"
+                }
+              }
+            ]
+          }
+        },
+        "examples": [
+          {
+            "extraConfigMap": {
+              "name": "FOO",
+              "mountPath": "/mount/path/to/folder",
+              "subPath": "/if/needed",
+              "data": {
+                "key1": "value1",
+                "key2": "value2"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "extraEnvFrom": {
+      "type": "array",
+      "description": "Additional environment variables mapped from Secret or ConfigMap",
+      "required": [],
+      "items": {
+        "type": "object",
+        "properties": {
+          "configMapRef": {
+            "type": "object",
+            "description": "ConfigMap reference",
+            "required": [],
+            "properties": {
+              "name": {
+                "type": "string",
+                "default": "",
+                "description": "Name of the ConfigMap",
+                "required": [],
+                "examples": [{ "name": "FOO" }]
+              }
+            },
+            "examples": [
+              {
+                "configMapRef": {
+                  "name": "FOO"
+                }
+              }
+            ]
+          },
+          "secretRef": {
+            "type": "object",
+            "description": "Secret reference",
+            "required": [],
+            "properties": {
+              "name": {
+                "type": "string",
+                "default": "",
+                "description": "Name of the Secret",
+                "required": [],
+                "examples": [{ "name": "FOO" }]
+              }
+            },
+            "examples": [
+              {
+                "secretRef": {
+                  "name": "FOO"
+                }
+              }
+            ]
+          }
+        },
+        "examples": [
+          {
+            "extraEnvFrom": [
+              {
+                "configMapRef": {
+                  "name": "FOO"
+                }
+              },
+              {
+                "secretRef": {
+                  "name": "FOO"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "extraMemoryMount": {
+      "type": "array",
+      "description": "Additional in-memory mounts",
+      "required": [],
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": "",
+            "description": "Name of the mount",
+            "required": [],
+            "examples": [{ "name": "FOO" }]
+          },
+          "mountPath": {
+            "type": "string",
+            "default": "",
+            "description": "Where the Mount should be mounted",
+            "required": [],
+            "examples": [{ "mountPath": "/mount/path/to/folder" }]
+          },
+          "subPath": {
+            "type": "string",
+            "default": "",
+            "description": "SubPath for the mount",
+            "required": [],
+            "examples": [{ "subPath": "/if/needed" }]
+          },
+          "sizeLimit": {
+            "type": "string",
+            "default": "",
+            "description": "Size limit of the mount",
+            "required": [],
+            "examples": [{ "sizeLimit": "500Mi" }]
+          }
+        },
+        "examples": [
+          {
+            "extraMemoryMount": [
+              {
+                "name": "FOO",
+                "mountPath": "/mount/path/to",
+                "subPath": "/if/needed",
+                "sizeLimit": "500Mi"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

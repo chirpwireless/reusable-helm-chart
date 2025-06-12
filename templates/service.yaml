@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "reusable-helm-chart.fullname" . }}
+  labels:
+    {{- include "reusable-helm-chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    {{- range .Values.service.ports }}
+    - name: {{ .name }}
+      targetPort: {{ .targetPort }}
+      protocol: TCP
+      port: {{ .port }}
+      {{- if hasKey . "nodePort" }}
+      nodePort: {{ .nodePort }}
+      {{- end }}
+    {{- end }}
+  selector:
+    {{- include "reusable-helm-chart.selectorLabels" . | nindent 4 }}

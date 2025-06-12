@@ -1,0 +1,20 @@
+{{- if .Values.global.metrics.enabled -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    {{- include "reusable-helm-chart.labels" . | nindent 4 }}
+  name: {{ include "reusable-helm-chart.fullname" . }}
+spec:
+  endpoints:
+    - interval: {{ .Values.global.metrics.interval | default "60s"}}
+      scrapeTimeout: {{ .Values.global.metrics.scrapeTimeout | default "10s" }}
+      path: {{ .Values.global.metrics.path }}
+      port: {{ .Values.global.metrics.port }}
+  namespaceSelector:
+    matchNames:
+      - "{{ .Release.Namespace }}"
+  selector:
+    matchLabels:
+       {{- include "reusable-helm-chart.selectorLabels" . | nindent 6 }}
+{{- end }}
