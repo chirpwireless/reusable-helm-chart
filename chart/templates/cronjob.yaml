@@ -1,0 +1,102 @@
+{{- range .Values.cronjob }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "reusable-helm-chart.fullname" $ }}-{{ .name}}
+  labels:
+    {{- include "reusable-helm-chart.labels" $ | nindent 4 }}
+spec:  
+  schedule: "{{ .schedule }}"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: {{ default 1 .successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ default 3 .failedJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 600
+      template:
+        metadata:
+          annotations:
+            {{- with .podAnnotations }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+        spec:
+          {{- with $.Values.global.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          serviceAccountName: {{ include "reusable-helm-chart.serviceAccountName" $ }}
+          initContainers:
+            {{- include "application.initContainers" (list $ .) | nindent 12 }}
+          containers:
+            - name: application
+              image: "{{ .image.repository }}:{{ .image.tag }}"
+              imagePullPolicy: {{ .image.pullPolicy }}
+              env:
+                {{- with .extraEnv }}
+                {{- toYaml . | nindent 16 }}
+                {{- end }}
+              envFrom:
+                {{- with .extraEnvFrom }}
+                {{- toYaml . | nindent 14 }}
+                {{- end }}
+              {{- with .command }}
+              command: {{ . }}
+              {{- end }}
+              volumeMounts:
+                {{- range .extraMemoryMount }}
+                {{- if .mountPath }}
+                - name: memory-{{ .name }}
+                  mountPath: {{ .mountPath }}
+                  {{- if .subPath }}
+                  subPath: {{ .subPath }}
+                  {{- end }}
+                {{- end }}
+                {{- end }}
+                {{- range .extraConfigMap }}
+                {{- if .mountPath }}
+                - name: configmap-{{ .name }}
+                  mountPath: {{ .mountPath }}
+                  {{- if .subPath }}
+                  subPath: {{ .subPath }}
+                  {{- end }}
+                {{- end }}
+                {{- end }}
+                {{- range .Values.extraVolumeMounts }}
+                {{- if .mountPath }}
+                - name: {{ .name }}
+                  mountPath: {{ .mountPath }}
+                  {{- if .subPath }}
+                  subPath: {{ .subPath }}
+                  {{- end }}
+                {{- end }}
+                {{- end }}
+          restartPolicy: OnFailure
+        {{- with .nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
+          volumes:
+            {{- range .extraMemoryMount }}
+            {{- if .mountPath }}
+            - name: memory-{{ .name }}
+              emptyDir:
+                medium: Memory
+                sizeLimit: {{ .sizeLimit }}
+            {{- end }}
+            {{- end }}
+            {{- range .extraConfigMap }}
+            {{- if .mountPath }}
+            - name: configmap-{{ .name }}
+              configMap:
+                name: {{ template "reusable-helm-chart.fullname" $ }}-{{ .name }}
+            {{- end }}
+            {{- end }}
+            {{- range .Values.extraVolumeMounts }}
+            {{- if .mountPath }}
+            - name: {{ .name }}
+              {{- toYaml .volumeSource | nindent 14 }}
+            {{- end }}
+            {{- end }}
+---
+{{- end }}
