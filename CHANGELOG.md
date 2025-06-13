@@ -1,3 +1,12 @@
+# [1.1.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.0.0...v1.1.0) (2025-06-13)
+
+
+### Features
+
+* add cluster-level RBAC templates for non-namespaced deployments ([9e5ed4c](https://github.com/chirpwireless/reusable-helm-chart/commit/9e5ed4c974385b039fd4dbacd28ab2115a7a3c33))
+* add cronjob support and fix volume mount indentation in deployment template ([de8e9bd](https://github.com/chirpwireless/reusable-helm-chart/commit/de8e9bd88d3ee8c98a2e3cabb5800ddc7de4d217))
+* add support for custom volume mounts in helm chart deployment ([9d66777](https://github.com/chirpwireless/reusable-helm-chart/commit/9d6677716bc4426ee81acde04bb422083388090a))
+
 # 1.0.0 (2025-06-13)
 
 
