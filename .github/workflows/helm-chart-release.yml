@@ -89,6 +89,6 @@ jobs:
       - name: Set up chart-releaser
         uses: helm/chart-releaser-action@v1
         with:
-          charts_dir: .
+          charts_dir: "./"
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
