@@ -1,24 +1,7 @@
-name: Helm Chart Validation and Release
+name: Helm Chart Release
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "**/*.yaml"
-      - "**/*.yml"
-      - "**/*.json"
-      - "Chart.yaml"
-      - "values.yaml"
-      - "templates/**"
-  pull_request:
-    branches: [main]
-    paths:
-      - "**/*.yaml"
-      - "**/*.yml"
-      - "**/*.json"
-      - "Chart.yaml"
-      - "values.yaml"
-      - "templates/**"
+  workflow_dispatch:
 
 jobs:
   lint-test:
@@ -52,7 +35,6 @@ jobs:
 
   release:
     needs: lint-test
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -97,7 +79,7 @@ jobs:
 
           git add Chart.yaml
           git commit -m "chore: update chart version to $NEW_VERSION [skip ci]"
-          git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+          git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:release
 
       - name: Package Helm Chart
         run: |
