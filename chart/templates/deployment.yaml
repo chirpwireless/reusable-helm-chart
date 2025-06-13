@@ -74,11 +74,13 @@ spec:
             {{- end }}
             {{- end }}
             {{- range .Values.extraVolumeMounts }}
+            {{- if .mountPath }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
               {{- if .subPath }}
               subPath: {{ .subPath }}
               {{- end }}
+            {{- end }}
             {{- end }}
           startupProbe:
             {{- toYaml .Values.startupProbe | nindent 12 }}
@@ -116,6 +118,6 @@ spec:
         {{- end }}
         {{- range .Values.extraVolumeMounts }}
         - name: {{ .name }}
-          {{- toYaml .volumeSource | nindent 4 }}
+          {{- toYaml .volumeSource | nindent 10 }}
         {{- end }}
 {{- end }}
