@@ -25,13 +25,13 @@ jobs:
         uses: helm/chart-testing-action@v2
 
       - name: Run chart-testing (lint)
-        run: ct lint --target-branch ${{ github.event.repository.default_branch }} --charts charts
+        run: ct lint --target-branch ${{ github.event.repository.default_branch }} --charts chart
 
       - name: Run helm lint
-        run: helm lint charts
+        run: helm lint chart
 
       - name: Run helm template validation
-        run: helm template charts --debug
+        run: helm template chart --debug
 
   release:
     needs: lint-test
@@ -57,7 +57,7 @@ jobs:
       - name: Get current version
         id: get_current_version
         run: |
-          CURRENT_VERSION=$(grep 'version:' charts/Chart.yaml | sed 's/version: //')
+          CURRENT_VERSION=$(grep 'version:' chart/Chart.yaml | sed 's/version: //')
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "Current Chart.yaml version: $CURRENT_VERSION"
 
@@ -80,13 +80,15 @@ jobs:
           CURRENT_VERSION=${{ steps.get_current_version.outputs.version }}
 
           echo "Updating Chart.yaml version from $CURRENT_VERSION to $NEW_VERSION"
-          sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" charts/Chart.yaml
+          sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" chart/Chart.yaml
 
-          git add charts/Chart.yaml
+          git add chart/Chart.yaml
           git commit -m "chore: update chart version to $NEW_VERSION [skip ci]"
           git push origin HEAD:release
 
       - name: Set up chart-releaser
         uses: helm/chart-releaser-action@v1
+        with:
+          charts_dir: "."
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
