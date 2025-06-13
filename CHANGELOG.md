@@ -1,0 +1,26 @@
+# 1.0.0 (2025-06-13)
+
+
+### Bug Fixes
+
+* add automount option for service account token in Helm chart schema ([2c13b3a](https://github.com/chirpwireless/reusable-helm-chart/commit/2c13b3a42d37591fa8b244857c2cea941556916f))
+* correct charts directory path in helm chart release workflow ([5d67102](https://github.com/chirpwireless/reusable-helm-chart/commit/5d6710212fc38e5c64754772d1623c324cb00cf8))
+* Small bugfixes to test release flow ([bc3d8c2](https://github.com/chirpwireless/reusable-helm-chart/commit/bc3d8c217d8622a68a28eaae3c2019fc89a63afd))
+* update git remote handling to use separate authenticated origin for pushes ([f3effeb](https://github.com/chirpwireless/reusable-helm-chart/commit/f3effeb65f9b668f670b97141e297e42b676b226))
+* update GitHub token reference to use default GITHUB_TOKEN ([b30b810](https://github.com/chirpwireless/reusable-helm-chart/commit/b30b810d352ed17a0964ec1c3efe3f3cc21b3120))
+* update GitHub token to use GH_CI_PASSWORD secret for semantic release ([7214e61](https://github.com/chirpwireless/reusable-helm-chart/commit/7214e6142a8488285f8b2377996867e47c38c607))
+* update helm chart paths from . to chart in validation workflow ([1839506](https://github.com/chirpwireless/reusable-helm-chart/commit/183950685b3e15515bbcd58a83bfd2126a217531))
+* update helm chart paths from root to charts directory in CI workflow ([88ab3cb](https://github.com/chirpwireless/reusable-helm-chart/commit/88ab3cb54716308e7f29a60a07d44924e433b51a))
+* update helm repository URLs to use reusable-helm-chart path ([64ab821](https://github.com/chirpwireless/reusable-helm-chart/commit/64ab821d8f1cbd41369f528f1e836f4d817bdec6))
+* update semantic-release condition check to use string comparison ([7355dc4](https://github.com/chirpwireless/reusable-helm-chart/commit/7355dc4623b2db123f88c9d547dd4a8ee896338e))
+* update serviceAccount template ([107a07a](https://github.com/chirpwireless/reusable-helm-chart/commit/107a07a524585ed31307e00c5bc0a3d00e746f10))
+
+
+### Features
+
+* add chart-releaser config file and integrate with release workflow ([b816089](https://github.com/chirpwireless/reusable-helm-chart/commit/b816089f4d109ffe58950ede70090e382299011e))
+* add maintainer list ([ddb2fd5](https://github.com/chirpwireless/reusable-helm-chart/commit/ddb2fd5dd229b4288732559b4e3dd3936ac3e6fa))
+* add support for sidecar containers in helm chart with configurable mounts and env vars ([70870f9](https://github.com/chirpwireless/reusable-helm-chart/commit/70870f97eb475cba0ced13b1f8eae5fc58f80979))
+* enable service account creation by default ([12ee542](https://github.com/chirpwireless/reusable-helm-chart/commit/12ee5424dfd867a111b8801033ededad700e6673))
+* remove scheduled label ([1347083](https://github.com/chirpwireless/reusable-helm-chart/commit/1347083a1dd689444f00006986654909e40554e1))
+* trigger github-action ([18a2dd5](https://github.com/chirpwireless/reusable-helm-chart/commit/18a2dd5d55d34aa8d0a3f5827b33d62e6985dbfb))
