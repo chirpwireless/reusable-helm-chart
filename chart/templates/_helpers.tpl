@@ -169,3 +169,52 @@ Create custom initContainers for application and cronjob
   command: {{ .command }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Create custom sidecars for application and cronjob
+*/}}
+{{- define "application.sidecars" -}}
+{{- $top := index . 0 }}
+{{- $context := index . 1 }}
+{{- range $context.sidecars }}
+- name: {{ .name }}
+  image: "{{ .image.repository }}:{{ .image.tag }}"
+  imagePullPolicy: {{ .image.pullPolicy }}
+  env:
+    {{- range $context.extraEnv }}
+    - name: {{ .name }}
+      value: {{ .value | quote }}
+    {{- end }}
+    {{- range .extraEnv }}
+    - name: {{ .name }}
+      value: {{ .value | quote }}
+    {{- end }}
+  envFrom:
+    {{- with $context.extraEnvFrom }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .extraEnvFrom }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  volumeMounts:
+    {{- range $context.extraMemoryMount }}
+    {{- if .mountPath }}
+    - name: memory-{{ .name }}
+      mountPath: {{ .mountPath }}
+      {{- if .subPath }}
+      subPath: {{ .subPath }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- range $context.extraConfigMap }}
+    {{- if .mountPath }}
+    - name: configmap-{{ .name }}
+      mountPath: {{ .mountPath }}
+      {{- if .subPath }}
+      subPath: {{ .subPath }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+  command: {{ .command }}
+{{- end -}}
+{{- end -}}

@@ -33,6 +33,7 @@ spec:
       initContainers:
         {{- include "application.initContainers" (list . .Values) | nindent 8 }}
       containers:
+        {{- include "application.sidecars" (list . .Values) | nindent 8 }}
         - name: application
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}

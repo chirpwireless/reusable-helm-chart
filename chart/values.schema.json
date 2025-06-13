@@ -411,7 +411,7 @@
     "initContainers": {
       "type": "array",
       "description": "List of init containers for the application",
-      "required": ["command"],
+      "required": [],
       "items": {
         "type": "object",
         "properties": {
@@ -487,6 +487,123 @@
             "initContainers": [
               {
                 "name": "my-init-container",
+                "image": {
+                  "repository": "gcr.io/google_containers/echoserver",
+                  "pullPolicy": "IfNotPresent",
+                  "tag": "latest"
+                },
+                "command": "/bin/sh -c 'echo Hello World'",
+                "extraEnvFrom": [
+                  {
+                    "configMapRef": {
+                      "name": "FOO"
+                    }
+                  },
+                  {
+                    "secretRef": {
+                      "name": "FOO"
+                    }
+                  }
+                ],
+                "extraConfigMap": {
+                  "name": "FOO",
+                  "mountPath": "/mount/path/to/folder",
+                  "subPath": "/if/needed",
+                  "data": { "key1": "value1", "key2": "value2" }
+                },
+                "extraMemoryMounts": [
+                  {
+                    "name": "FOO",
+                    "mountPath": "/mount/path/to",
+                    "subPath": "/if/needed",
+                    "sizeLimit": "500Mi"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "sidecars": {
+      "type": "array",
+      "description": "List of sidecars for the application",
+      "required": [],
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": "",
+            "description": "Name of the sidecar",
+            "required": [],
+            "examples": [{ "name": "my-sidecar" }]
+          },
+          "image": {
+            "type": "object",
+            "description": "The Image configuration for sidecar",
+            "required": [],
+            "properties": {
+              "repository": {
+                "type": "string",
+                "default": "gcr.io/google_containers/echoserver",
+                "description": "Full image URL",
+                "required": [],
+                "examples": [
+                  { "repository": "gcr.io/google_containers/echoserver" }
+                ]
+              },
+              "pullPolicy": {
+                "type": "string",
+                "default": "IfNotPresent",
+                "pattern": "^(Always|Never|IfNotPresent)$",
+                "description": "The pullPolicy Schema",
+                "required": [],
+                "examples": [{ "pullPolicy": "Always" }]
+              },
+              "tag": {
+                "type": "string",
+                "default": "",
+                "description": "The image tag",
+                "required": [],
+                "examples": [{ "tag": "latest" }]
+              }
+            },
+            "examples": [
+              {
+                "image": {
+                  "repository": "gcr.io/google_containers/echoserver",
+                  "pullPolicy": "IfNotPresent",
+                  "tag": "latest"
+                }
+              }
+            ]
+          },
+          "command": {
+            "type": "string",
+            "default": "",
+            "description": "Command for sidecar",
+            "required": [],
+            "examples": [{ "command": "/bin/sh -c 'echo Hello World'" }]
+          },
+          "extraEnv": {
+            "$ref": "#/$defs/extraEnv"
+          },
+          "extraEnvFrom": {
+            "$ref": "#/$defs/extraEnvFrom"
+          },
+          "extraConfigMap": {
+            "$ref": "#/$defs/extraConfigMap"
+          },
+          "extraMemoryMount": {
+            "$ref": "#/$defs/extraMemoryMount"
+          }
+        },
+        "examples": [
+          {
+            "sidecars": [
+              {
+                "name": "my-sidecar",
                 "image": {
                   "repository": "gcr.io/google_containers/echoserver",
                   "pullPolicy": "IfNotPresent",

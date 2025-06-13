@@ -144,11 +144,59 @@ command: ""
 #       repository: ""
 #       pullPolicy: IfNotPresent
 #       tag: ""
-#     command: ""
 #     extraEnv:
 #       - name: FOO
 #         value: "bar"
+#     extraEnvFrom:
+#       - configMapRef:
+#           name: FOO
+#       - secretRef:
+#           name: FOO
+#     extraConfigMap:
+#       - name: FOO
+#         mountPath: /mount/path/to/
+#         subPath: /if/needed
+#         data:
+#           key: value
+#     extraMemoryMount:
+#       - name: FOO
+#         mountPath: /mount/path/to
+#         subPath: /if/needed
+#         sizeLimit: 500Mi
+#     command: ""
+#
 initContainers: []
+
+# @param sidecars List of sidecar containers for the application
+# Example:
+# sidecars:
+#   - name: sidecar-container-name
+#     image:
+#       repository: ""
+#       pullPolicy: IfNotPresent
+#       tag: ""
+#     extraEnv:
+#       - name: FOO
+#         value: "bar"
+#     extraEnvFrom:
+#       - configMapRef:
+#           name: FOO
+#       - secretRef:
+#           name: FOO
+#     extraConfigMap:
+#       - name: FOO
+#         mountPath: /mount/path/to/
+#         subPath: /if/needed
+#         data:
+#           key: value
+#     extraMemoryMount:
+#       - name: FOO
+#         mountPath: /mount/path/to
+#         subPath: /if/needed
+#         sizeLimit: 500Mi
+#     command: ""
+#
+sidecars: []
 
 # @param externalSecrets External secrets for the application
 # Only available for Kubernetes
