@@ -225,6 +225,13 @@
               "properties": {},
               "examples": []
             },
+            "automount": {
+              "type": "boolean",
+              "default": false,
+              "description": "Automount the service account token",
+              "required": [],
+              "examples": [{ "automount": true }]
+            },
             "name": {
               "type": "string",
               "default": "",
@@ -238,6 +245,7 @@
               "serviceAccount": {
                 "create": true,
                 "annotations": {},
+                "automount": true,
                 "name": "my-cool-sa-name"
               }
             }
@@ -280,6 +288,7 @@
             "serviceAccount": {
               "create": true,
               "annotations": {},
+              "automount": true,
               "name": "my-cool-sa-name"
             }
           }
@@ -1774,6 +1783,7 @@
         "serviceAccount": {
           "create": false,
           "annotations": {},
+          "automount": false,
           "name": ""
         }
       },
