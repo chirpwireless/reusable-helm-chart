@@ -81,7 +81,7 @@ jobs:
 
   release:
     needs: version-update
-    if: needs.version-update.outputs.release_published == 'true'
+    if: needs.version-update.outputs.new_version != ''
     runs-on: ubuntu-latest
     permissions:
       contents: write
