@@ -33,7 +33,7 @@ jobs:
       - name: Run helm template validation
         run: helm template . --debug
 
-  version-update:
+  release:
     needs: lint-test
     runs-on: ubuntu-latest
     permissions:
@@ -79,26 +79,8 @@ jobs:
           git commit -m "chore: update chart version to $NEW_VERSION [skip ci]"
           git push origin HEAD:release
 
-  release:
-    needs: version-update
-    if: needs.version-update.outputs.new_version != ''
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-
       - name: Set up chart-releaser
+        if: steps.semantic.outputs.new_release_version != ''
         uses: helm/chart-releaser-action@v1
         with:
           charts_dir: .
