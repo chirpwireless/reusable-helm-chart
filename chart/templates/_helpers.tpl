@@ -30,7 +30,6 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "reusable-helm-chart.labels" -}}
-scheduled: {{ .Values.global.scheduled | quote}}
 helm.sh/chart: {{ include "reusable-helm-chart.chart" . }}
 {{ include "reusable-helm-chart.selectorLabels" . }}
 app.kubernetes.io/type: application
