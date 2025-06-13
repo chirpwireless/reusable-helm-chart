@@ -46,7 +46,7 @@ global:
     rules: []
     annotations: {}
   serviceAccount:
-    create: false
+    create: true
     annotations: {}
     name: ""
 
