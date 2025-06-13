@@ -57,7 +57,7 @@ jobs:
       - name: Get current version
         id: get_current_version
         run: |
-          CURRENT_VERSION=$(grep 'version:' Chart.yaml | sed 's/version: //')
+          CURRENT_VERSION=$(grep 'version:' charts/Chart.yaml | sed 's/version: //')
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "Current Chart.yaml version: $CURRENT_VERSION"
 
@@ -80,15 +80,13 @@ jobs:
           CURRENT_VERSION=${{ steps.get_current_version.outputs.version }}
 
           echo "Updating Chart.yaml version from $CURRENT_VERSION to $NEW_VERSION"
-          sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" Chart.yaml
+          sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" charts/Chart.yaml
 
-          git add Chart.yaml
+          git add charts/Chart.yaml
           git commit -m "chore: update chart version to $NEW_VERSION [skip ci]"
           git push origin HEAD:release
 
       - name: Set up chart-releaser
         uses: helm/chart-releaser-action@v1
-        with:
-          charts_dir: "./"
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
