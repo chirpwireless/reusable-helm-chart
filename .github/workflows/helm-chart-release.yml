@@ -25,13 +25,13 @@ jobs:
         uses: helm/chart-testing-action@v2
 
       - name: Run chart-testing (lint)
-        run: ct lint --target-branch ${{ github.event.repository.default_branch }} --charts .
+        run: ct lint --target-branch ${{ github.event.repository.default_branch }} --charts charts
 
       - name: Run helm lint
-        run: helm lint .
+        run: helm lint charts
 
       - name: Run helm template validation
-        run: helm template . --debug
+        run: helm template charts --debug
 
   release:
     needs: lint-test
