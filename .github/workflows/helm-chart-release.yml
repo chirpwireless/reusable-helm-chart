@@ -54,6 +54,13 @@ jobs:
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
+      - name: Get current version
+        id: get_current_version
+        run: |
+          CURRENT_VERSION=$(grep 'version:' Chart.yaml | sed 's/version: //')
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current Chart.yaml version: $CURRENT_VERSION"
+
       - name: Semantic versioning
         id: semantic
         uses: cycjimmy/semantic-release-action@v4
@@ -67,10 +74,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update Chart.yaml version
-        if: steps.semantic.outputs.new_release_version != ''
+        if: steps.semantic.outputs.new_release_version != steps.get_current_version.outputs.version
         run: |
           NEW_VERSION=${{ steps.semantic.outputs.new_release_version }}
-          CURRENT_VERSION=$(grep 'version:' Chart.yaml | sed 's/version: //')
+          CURRENT_VERSION=${{ steps.get_current_version.outputs.version }}
 
           echo "Updating Chart.yaml version from $CURRENT_VERSION to $NEW_VERSION"
           sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" Chart.yaml
@@ -80,7 +87,6 @@ jobs:
           git push origin HEAD:release
 
       - name: Set up chart-releaser
-        if: steps.semantic.outputs.new_release_version != ''
         uses: helm/chart-releaser-action@v1
         with:
           charts_dir: .
