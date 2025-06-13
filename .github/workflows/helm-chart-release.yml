@@ -73,7 +73,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update Chart.yaml version
-        if: steps.semantic.outputs.new_release_published == true
+        if: steps.semantic.outputs.new_release_published == 'true'
         run: |
           NEW_VERSION=${{ steps.semantic.outputs.new_release_version }}
           CURRENT_VERSION=${{ steps.get_current_version.outputs.version }}
@@ -95,7 +95,7 @@ jobs:
         # Popular action to deploy to GitHub Pages:
         # Docs: https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
       - name: Deploy to GitHub Pages
-        if: steps.semantic.outputs.new_release_published == true
+        if: steps.semantic.outputs.new_release_published == 'true'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
