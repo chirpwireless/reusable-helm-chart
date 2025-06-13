@@ -89,7 +89,7 @@ jobs:
           git push authenticated-origin HEAD:release
 
           helm package ./chart --destination ./packaged-charts
-          helm repo index ./packaged-charts --url https://${{ github.repository_owner }}.github.io/drowzee
+          helm repo index ./packaged-charts --url https://${{ github.repository_owner }}.github.io/reusable-helm-chart
 
       # Popular action to deploy to GitHub Pages:
       # Docs: https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus

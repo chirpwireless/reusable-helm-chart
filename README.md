@@ -22,7 +22,7 @@ A flexible and reusable Helm chart for deploying applications on Kubernetes.
 ### Adding the Helm Repository
 
 ```bash
-helm repo add chirpwireless https://chirpwireless.github.io/helm-charts
+helm repo add chirpwireless https://chirpwireless.github.io/reusable-helm-chart
 helm repo update
 ```
 
