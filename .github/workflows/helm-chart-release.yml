@@ -91,6 +91,8 @@ jobs:
         with:
           name: helm-chart
           path: .cr-release-packages/*.tgz
+          if-no-files-found: error
+          include-hidden-files: true
 
       - name: Set up chart-releaser
         uses: helm/chart-releaser-action@v1
