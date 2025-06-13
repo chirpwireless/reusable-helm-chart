@@ -48,6 +48,7 @@ global:
   serviceAccount:
     create: true
     annotations: {}
+    automount: true
     name: ""
 
 # @param deployment Deployment configuration for the chart
