@@ -417,6 +417,9 @@
     "extraMemoryMount": {
       "$ref": "#/$defs/extraMemoryMount"
     },
+    "extraVolumeMounts": {
+      "$ref": "#/$defs/extraVolumeMounts"
+    },
     "initContainers": {
       "type": "array",
       "description": "List of init containers for the application",
@@ -489,6 +492,9 @@
           },
           "extraMemoryMount": {
             "$ref": "#/$defs/extraMemoryMount"
+          },
+          "extraVolumeMounts": {
+            "$ref": "#/$defs/extraVolumeMounts"
           }
         },
         "examples": [
@@ -526,6 +532,28 @@
                     "mountPath": "/mount/path/to",
                     "subPath": "/if/needed",
                     "sizeLimit": "500Mi"
+                  }
+                ],
+                "extraVolumeMounts": [
+                  {
+                    "name": "config-volume",
+                    "mountPath": "/etc/config",
+                    "subPath": "/if/needed",
+                    "volumeSource": {
+                      "configMap": {
+                        "name": "my-config-map"
+                      }
+                    }
+                  },
+                  {
+                    "name": "secret-volume",
+                    "mountPath": "/etc/secrets",
+                    "subPath": "/if/needed",
+                    "volumeSource": {
+                      "secret": {
+                        "secretName": "my-secret"
+                      }
+                    }
                   }
                 ]
               }
@@ -606,6 +634,9 @@
           },
           "extraMemoryMount": {
             "$ref": "#/$defs/extraMemoryMount"
+          },
+          "extraVolumeMounts": {
+            "$ref": "#/$defs/extraVolumeMounts"
           }
         },
         "examples": [
@@ -643,6 +674,28 @@
                     "mountPath": "/mount/path/to",
                     "subPath": "/if/needed",
                     "sizeLimit": "500Mi"
+                  }
+                ],
+                "extraVolumeMounts": [
+                  {
+                    "name": "config-volume",
+                    "mountPath": "/etc/config",
+                    "subPath": "/if/needed",
+                    "volumeSource": {
+                      "configMap": {
+                        "name": "my-config-map"
+                      }
+                    }
+                  },
+                  {
+                    "name": "secret-volume",
+                    "mountPath": "/etc/secrets",
+                    "subPath": "/if/needed",
+                    "volumeSource": {
+                      "secret": {
+                        "secretName": "my-secret"
+                      }
+                    }
                   }
                 ]
               }
@@ -866,6 +919,9 @@
           "extraMemoryMount": {
             "$ref": "#/$defs/extraMemoryMount"
           },
+          "extraVolumeMounts": {
+            "$ref": "#/$defs/extraVolumeMounts"
+          },
           "initContainers": {
             "type": "array",
             "description": "List of init containers for the application",
@@ -938,6 +994,9 @@
                 },
                 "extraMemoryMount": {
                   "$ref": "#/$defs/extraMemoryMount"
+                },
+                "extraVolumeMounts": {
+                  "$ref": "#/$defs/extraVolumeMounts"
                 }
               },
               "examples": [
@@ -975,6 +1034,28 @@
                           "mountPath": "/mount/path/to",
                           "subPath": "/if/needed",
                           "sizeLimit": "500Mi"
+                        }
+                      ],
+                      "extraVolumeMounts": [
+                        {
+                          "name": "config-volume",
+                          "mountPath": "/etc/config",
+                          "subPath": "/if/needed",
+                          "volumeSource": {
+                            "configMap": {
+                              "name": "my-config-map"
+                            }
+                          }
+                        },
+                        {
+                          "name": "secret-volume",
+                          "mountPath": "/etc/secrets",
+                          "subPath": "/if/needed",
+                          "volumeSource": {
+                            "secret": {
+                              "secretName": "my-secret"
+                            }
+                          }
                         }
                       ]
                     }
@@ -1045,6 +1126,28 @@
                 "mountPath": "/mount/path/to",
                 "subPath": "/if/needed",
                 "sizeLimit": "500Mi"
+              }
+            ],
+            "extraVolumeMounts": [
+              {
+                "name": "config-volume",
+                "mountPath": "/etc/config",
+                "subPath": "/if/needed",
+                "volumeSource": {
+                  "configMap": {
+                    "name": "my-config-map"
+                  }
+                }
+              },
+              {
+                "name": "secret-volume",
+                "mountPath": "/etc/secrets",
+                "subPath": "/if/needed",
+                "volumeSource": {
+                  "secret": {
+                    "secretName": "my-secret"
+                  }
+                }
               }
             ],
             "podAnnotations": {},
@@ -1807,6 +1910,7 @@
       "extraConfigMap": [],
       "extraEnvFrom": [],
       "extraMemoryMount": [],
+      "extraVolumeMounts": [],
       "command": "/bin/sh -c 'echo Hello World'",
       "podAnnotations": {
         "application.framework": "golang"
@@ -2084,6 +2188,81 @@
                 "mountPath": "/mount/path/to",
                 "subPath": "/if/needed",
                 "sizeLimit": "500Mi"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "extraVolumeMounts": {
+      "type": "array",
+      "description": "Extra volume mounts for application container",
+      "required": [],
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": "",
+            "description": "Name of the volume mount",
+            "required": [],
+            "examples": [{ "name": "config-volume" }]
+          },
+          "mountPath": {
+            "type": "string",
+            "default": "",
+            "description": "Where the volume should be mounted",
+            "required": [],
+            "examples": [{ "mountPath": "/etc/config" }]
+          },
+          "subPath": {
+            "type": "string",
+            "default": "",
+            "description": "SubPath for the mount",
+            "required": [],
+            "examples": [{ "subPath": "/if/needed" }]
+          },
+          "volumeSource": {
+            "type": "object",
+            "description": "Kubernetes volume source configuration",
+            "required": [],
+            "properties": {},
+            "examples": [
+              {
+                "configMap": {
+                  "name": "my-config-map"
+                }
+              },
+              {
+                "secret": {
+                  "secretName": "my-secret"
+                }
+              }
+            ]
+          }
+        },
+        "examples": [
+          {
+            "extraVolumeMounts": [
+              {
+                "name": "config-volume",
+                "mountPath": "/etc/config",
+                "subPath": "/if/needed",
+                "volumeSource": {
+                  "configMap": {
+                    "name": "my-config-map"
+                  }
+                }
+              },
+              {
+                "name": "secret-volume",
+                "mountPath": "/etc/secrets",
+                "subPath": "/if/needed",
+                "volumeSource": {
+                  "secret": {
+                    "secretName": "my-secret"
+                  }
+                }
               }
             ]
           }

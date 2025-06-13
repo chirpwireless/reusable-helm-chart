@@ -73,6 +73,13 @@ spec:
               {{- end }}
             {{- end }}
             {{- end }}
+            {{- range .Values.extraVolumeMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              {{- if .subPath }}
+              subPath: {{ .subPath }}
+              {{- end }}
+            {{- end }}
           startupProbe:
             {{- toYaml .Values.startupProbe | nindent 12 }}
           livenessProbe:
@@ -106,5 +113,9 @@ spec:
             medium: Memory
             sizeLimit: {{ .sizeLimit }}
         {{- end }}
+        {{- end }}
+        {{- range .Values.extraVolumeMounts }}
+        - name: {{ .name }}
+          {{- toYaml .volumeSource | nindent 4 }}
         {{- end }}
 {{- end }}

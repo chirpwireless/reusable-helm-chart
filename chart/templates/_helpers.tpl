@@ -156,6 +156,15 @@ Create custom initContainers for application and cronjob
       {{- end }}
     {{- end }}
     {{- end }}
+    {{- range $context.extraVolumeMounts }}
+    {{- if .mountPath }}
+    - name: {{ .name }}
+      mountPath: {{ .mountPath }}
+      {{- if .subPath }}
+      subPath: {{ .subPath }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
     {{- range $context.extraConfigMap }}
     {{- if .mountPath }}
     - name: configmap-{{ .name }}
@@ -199,6 +208,15 @@ Create custom sidecars for application and cronjob
     {{- range $context.extraMemoryMount }}
     {{- if .mountPath }}
     - name: memory-{{ .name }}
+      mountPath: {{ .mountPath }}
+      {{- if .subPath }}
+      subPath: {{ .subPath }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- range $context.extraVolumeMounts }}
+    {{- if .mountPath }}
+    - name: {{ .name }}
       mountPath: {{ .mountPath }}
       {{- if .subPath }}
       subPath: {{ .subPath }}

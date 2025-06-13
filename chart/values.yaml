@@ -131,6 +131,24 @@ extraEnvFrom: []
 #     sizeLimit: 500Mi
 extraMemoryMount: []
 
+# @param extraVolumeMounts Extra volume mounts for application container
+# Example:
+# extraVolumeMounts:
+#   - name: config-volume
+#     mountPath: /etc/config
+#     subPath: /if/needed
+#     volumeSource:
+#       configMap:
+#         name: my-config-map
+#   - name: secret-volume
+#     mountPath: /etc/secrets
+#     subPath: /if/needed
+#     volumeSource:
+#       secret:
+#         secretName: my-secret
+#
+extraVolumeMounts: []
+
 # @param command Command to run in the container
 # Example:
 # command: "echo hello"
