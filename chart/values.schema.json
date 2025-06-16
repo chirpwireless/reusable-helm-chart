@@ -2182,7 +2182,7 @@
       "required": [],
       "items": {
         "type": "object",
-        "required": ["name", "value"],
+        "required": ["name"],
         "properties": {
           "name": {
             "type": "string",
