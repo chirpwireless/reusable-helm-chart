@@ -70,7 +70,7 @@ jobs:
 
       - name: Retrieve existing charts
         run: |
-          git clone --branch gh-pages https://github.com/${{ github.repository_owner }}/${{ github.repository }}.git existing-charts || true
+          git clone --branch gh-pages https://github.com/${{ github.repository }}.git existing-charts || true
 
           mkdir -p packaged-charts
           cp -n existing-charts/*.tgz packaged-charts/ || true
