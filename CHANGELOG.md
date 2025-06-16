@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.2.0...v1.2.1) (2025-06-16)
+
+
+### Bug Fixes
+
+* correct variable scope in extraVolumeMounts range loop ([48e6fed](https://github.com/chirpwireless/reusable-helm-chart/commit/48e6fedb5a329131898617a508532f6fe70a44da))
+
 # [1.2.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.1.0...v1.2.0) (2025-06-16)
 
 
