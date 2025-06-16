@@ -1,3 +1,11 @@
+## [1.3.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.3.0...v1.3.1) (2025-06-16)
+
+
+### Bug Fixes
+
+* update git clone URL to use full repository path in helm chart release workflow ([40e51c8](https://github.com/chirpwireless/reusable-helm-chart/commit/40e51c855ea8c2de54e2fbf01c17f69e854641b4))
+* update validation for schema ([300ab31](https://github.com/chirpwireless/reusable-helm-chart/commit/300ab31e81d7b28b963898ec34f1021f1bb5365c))
+
 # [1.3.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.2.1...v1.3.0) (2025-06-16)
 
 
