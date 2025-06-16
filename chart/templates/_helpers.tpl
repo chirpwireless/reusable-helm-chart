@@ -33,6 +33,8 @@ Common labels
 helm.sh/chart: {{ include "reusable-helm-chart.chart" . }}
 {{ include "reusable-helm-chart.selectorLabels" . }}
 app.kubernetes.io/type: application
+app.kubernetes.io/chart: {{ .Chart.Name | trunc 63 | trimSuffix "-" | trimSuffix "."  }}
+app.kubernetes.io/release: {{ .Release.Name | trunc 63 | trimSuffix "-" | trimSuffix "."  }}
 app.kubernetes.io/namespace: {{ .Release.Namespace }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | replace "+" "_" | trunc 63 | trimSuffix "-" | trimSuffix "."  | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
@@ -42,8 +44,8 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "reusable-helm-chart.selectorLabels" -}}
-app.kubernetes.io/chart: {{ .Chart.Name | trunc 63 | trimSuffix "-" | trimSuffix "."  }}
-app.kubernetes.io/release: {{ .Release.Name | trunc 63 | trimSuffix "-" | trimSuffix "."  }}
+app.kubernetes.io/name: {{ include "reusable-helm-chart.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name | trunc 63 | trimSuffix "-" | trimSuffix "."  }}
 {{- end -}}
 
 {{/*
@@ -174,7 +176,9 @@ Create custom initContainers for application and cronjob
       {{- end }}
     {{- end }}
     {{- end }}
-  command: {{ .command }}
+  {{- with .command }}
+  command: {{ . }}
+  {{- end }}
 {{- end -}}
 {{- end -}}
 
@@ -232,6 +236,17 @@ Create custom sidecars for application and cronjob
       {{- end }}
     {{- end }}
     {{- end }}
-  command: {{ .command }}
+    {{- range $context.extraVolumeMounts }}
+    {{- if .mountPath }}
+    - name: {{ .name }}
+      mountPath: {{ .mountPath }}
+      {{- if .subPath }}
+      subPath: {{ .subPath }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+  {{- with .command }}
+  command: {{ . }}
+  {{- end }}
 {{- end -}}
 {{- end -}}

@@ -1,21 +1,21 @@
-{{- if .Values.ingress.enabled -}}
+{{- range .Values.ingress }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "reusable-helm-chart.fullname" . }}
+  name: {{ include "reusable-helm-chart.fullname" $ }}{{ if .nameSuffix }}-{{ .nameSuffix }}{{ end }}
   labels:
-    {{- include "reusable-helm-chart.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+    {{- include "reusable-helm-chart.labels" $ | nindent 4 }}
+  {{- with .annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- with .Values.ingress.className }}
+  {{- with .className }}
   ingressClassName: {{ . }}
   {{- end }}
-  {{- if .Values.ingress.tls }}
+  {{- if .tls }}
   tls:
-    {{- range .Values.ingress.tls }}
+    {{- range .tls }}
     - hosts:
         {{- range .hosts }}
         - {{ . | quote }}
@@ -24,7 +24,7 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    {{- range .Values.ingress.hosts }}
+    {{- range .hosts }}
     - host: {{ .host | quote }}
       http:
         paths:
@@ -37,7 +37,8 @@ spec:
               service:
                 name: {{ include "reusable-helm-chart.fullname" $ }}
                 port:
-                  number: {{ $.Values.service.port }}
+                  number: {{ .servicePort }}
           {{- end }}
     {{- end }}
+---
 {{- end }}

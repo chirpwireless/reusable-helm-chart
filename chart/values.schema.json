@@ -1157,85 +1157,124 @@
       ]
     },
     "ingress": {
-      "type": "object",
-      "description": "Ingress for the application",
+      "type": "array",
+      "description": "List of Ingress objects for the application",
       "required": [],
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable Ingress",
-          "required": [],
-          "examples": [{ "enabled": true }]
-        },
-        "className": {
-          "type": "string",
-          "default": "",
-          "description": "Ingress ClassName",
-          "required": [],
-          "examples": [{ "className": "nginx" }]
-        },
-        "annotations": {
-          "type": "object",
-          "description": "Kubernetes annotations for the Ingress",
-          "required": [],
-          "properties": {},
-          "examples": []
-        },
-        "hosts": {
-          "type": "array",
-          "description": "Hosts configuration for Ingress",
-          "required": [],
-          "items": {
+      "items": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "nameSuffix": {
+            "type": "string",
+            "default": "",
+            "description": "Suffix to append to the ingress name for uniqueness",
+            "required": [],
+            "examples": [{ "nameSuffix": "api" }]
+          },
+          "className": {
+            "type": "string",
+            "default": "",
+            "description": "Ingress ClassName",
+            "required": [],
+            "examples": [{ "className": "nginx" }]
+          },
+          "annotations": {
             "type": "object",
-            "required": ["host", "paths"],
-            "properties": {
-              "host": {
-                "type": "string",
-                "default": "",
-                "description": "Ingress host",
-                "required": [],
-                "examples": [{ "host": "chart-example.local" }]
-              },
-              "paths": {
-                "type": "array",
-                "description": "Paths configuration for Ingress",
-                "required": [],
-                "items": {
-                  "type": "object",
-                  "required": ["path", "pathType"],
-                  "properties": {
-                    "path": {
-                      "type": "string",
-                      "default": "",
-                      "description": "Host path",
-                      "required": [],
-                      "examples": [{ "path": "/" }]
-                    },
-                    "pathType": {
-                      "type": "string",
-                      "default": "",
-                      "description": "Host pathType",
-                      "required": [],
-                      "examples": [{ "pathType": "ImplementationSpecific" }]
+            "description": "Kubernetes annotations for the Ingress",
+            "required": [],
+            "properties": {},
+            "examples": []
+          },
+          "hosts": {
+            "type": "array",
+            "description": "Hosts configuration for Ingress",
+            "required": [],
+            "items": {
+              "type": "object",
+              "required": ["host", "paths"],
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "default": "",
+                  "description": "Ingress host",
+                  "required": [],
+                  "examples": [{ "host": "chart-example.local" }]
+                },
+                "paths": {
+                  "type": "array",
+                  "description": "Paths configuration for Ingress",
+                  "required": [],
+                  "items": {
+                    "type": "object",
+                    "required": ["path", "pathType"],
+                    "properties": {
+                      "path": {
+                        "type": "string",
+                        "default": "",
+                        "description": "Host path",
+                        "required": [],
+                        "examples": [{ "path": "/" }]
+                      },
+                      "pathType": {
+                        "type": "string",
+                        "default": "",
+                        "description": "Host pathType",
+                        "required": [],
+                        "examples": [{ "pathType": "ImplementationSpecific" }]
+                      }
                     }
                   }
                 },
-                "examples": [
-                  {
-                    "paths": [
-                      {
-                        "path": "/",
-                        "pathType": "ImplementationSpecific"
-                      }
-                    ]
-                  }
-                ]
+                "servicePort": {
+                  "type": "number",
+                  "description": "Ingress service port",
+                  "required": [],
+                  "examples": [{ "servicePort": 80 }]
+                }
               }
             }
           },
-          "examples": [
+          "tls": {
+            "type": "array",
+            "description": "TLS configuration for Ingress",
+            "required": [],
+            "items": {
+              "type": "object",
+              "required": ["secretName", "hosts"],
+              "properties": {
+                "secretName": {
+                  "type": "string",
+                  "default": "",
+                  "description": "Name of the secret with certificate",
+                  "required": [],
+                  "examples": [{ "secretName": "chart-example-tls" }]
+                },
+                "hosts": {
+                  "type": "array",
+                  "description": "Hosts configuration for Ingress TLS",
+                  "required": [],
+                  "items": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Hosts for Ingress TLS",
+                    "required": [],
+                    "examples": ["chart-example.local"]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "examples": [
+        {
+          "ingress": [
             {
+              "nameSuffix": "api",
+              "className": "nginx",
+              "annotations": {
+                "nginx.ingress.kubernetes.io/proxy-read-timeout": "3600"
+              },
               "hosts": [
                 {
                   "host": "chart-example.local",
@@ -1244,48 +1283,10 @@
                       "path": "/",
                       "pathType": "ImplementationSpecific"
                     }
-                  ]
+                  ],
+                  "servicePort": 80
                 }
-              ]
-            }
-          ]
-        },
-        "tls": {
-          "type": "array",
-          "description": "TLS configuration for Ingress",
-          "required": [],
-          "items": {
-            "type": "object",
-            "required": ["secretName", "hosts"],
-            "properties": {
-              "secretName": {
-                "type": "string",
-                "default": "",
-                "description": "Name of the secret with certificate",
-                "required": [],
-                "examples": [{ "secretName": "chart-example-tls" }]
-              },
-              "hosts": {
-                "type": "array",
-                "description": "Hosts configuration for Ingress TLS",
-                "required": [],
-                "items": {
-                  "type": "string",
-                  "default": "",
-                  "description": "Hosts for Ingress TLS",
-                  "required": [],
-                  "examples": ["chart-example.local"]
-                },
-                "examples": [
-                  {
-                    "hosts": ["chart-example.local"]
-                  }
-                ]
-              }
-            }
-          },
-          "examples": [
-            {
+              ],
               "tls": [
                 {
                   "secretName": "chart-example-tls",
@@ -1294,32 +1295,6 @@
               ]
             }
           ]
-        }
-      },
-      "examples": [
-        {
-          "ingress": {
-            "enabled": true,
-            "className": "nginx",
-            "annotations": {},
-            "hosts": [
-              {
-                "host": "chart-example.local",
-                "paths": [
-                  {
-                    "path": "/",
-                    "pathType": "ImplementationSpecific"
-                  }
-                ]
-              }
-            ],
-            "tls": [
-              {
-                "secretName": "chart-example-tls",
-                "hosts": ["chart-example.local"]
-              }
-            ]
-          }
         }
       ]
     },
@@ -1928,13 +1903,7 @@
         ]
       },
       "cronjob": [],
-      "ingress": {
-        "enabled": false,
-        "className": "",
-        "annotations": {},
-        "hosts": [],
-        "tls": []
-      },
+      "ingress": [],
       "resources": {
         "limits": {
           "memory": "2000Mi"
