@@ -1,3 +1,11 @@
+## [1.3.2](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.3.1...v1.3.2) (2025-06-16)
+
+
+### Bug Fixes
+
+* make value field optional in environment variables schema ([e593247](https://github.com/chirpwireless/reusable-helm-chart/commit/e593247682c6c6556070f1fb2e96f01fc9fb7b2e))
+* move sidecar containers after main application container in deployment template ([b00e5f3](https://github.com/chirpwireless/reusable-helm-chart/commit/b00e5f33a2188a1f075815199d86a46f21f8cd06))
+
 ## [1.3.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.3.0...v1.3.1) (2025-06-16)
 
 
