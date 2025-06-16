@@ -2197,6 +2197,96 @@
             "description": "Environment variable value",
             "required": [],
             "examples": [{ "value": "BAR" }]
+          },
+          "valueFrom": {
+            "type": "object",
+            "description": "Source for the environment variable's value",
+            "required": [],
+            "properties": {
+              "configMapKeyRef": {
+                "type": "object",
+                "description": "Selects a key of a ConfigMap",
+                "required": ["name", "key"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the ConfigMap",
+                    "required": []
+                  },
+                  "key": {
+                    "type": "string",
+                    "description": "Key to select",
+                    "required": []
+                  },
+                  "optional": {
+                    "type": "boolean",
+                    "description": "Whether the ConfigMap or its key must be defined",
+                    "required": []
+                  }
+                }
+              },
+              "secretKeyRef": {
+                "type": "object",
+                "description": "Selects a key of a Secret",
+                "required": ["name", "key"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the Secret",
+                    "required": []
+                  },
+                  "key": {
+                    "type": "string",
+                    "description": "Key to select",
+                    "required": []
+                  },
+                  "optional": {
+                    "type": "boolean",
+                    "description": "Whether the Secret or its key must be defined",
+                    "required": []
+                  }
+                }
+              },
+              "fieldRef": {
+                "type": "object",
+                "description": "Selects a field of the pod",
+                "required": ["fieldPath"],
+                "properties": {
+                  "fieldPath": {
+                    "type": "string",
+                    "description": "Path of the field to select in the specified API version",
+                    "required": []
+                  },
+                  "apiVersion": {
+                    "type": "string",
+                    "description": "Version of the schema the field is defined in",
+                    "required": []
+                  }
+                }
+              },
+              "resourceFieldRef": {
+                "type": "object",
+                "description": "Selects a resource of the container",
+                "required": ["resource"],
+                "properties": {
+                  "containerName": {
+                    "type": "string",
+                    "description": "Container name",
+                    "required": []
+                  },
+                  "resource": {
+                    "type": "string",
+                    "description": "Required: resource to select",
+                    "required": []
+                  },
+                  "divisor": {
+                    "type": "string",
+                    "description": "Specifies the output format of the exposed resources",
+                    "required": []
+                  }
+                }
+              }
+            }
           }
         },
         "examples": [
