@@ -236,7 +236,7 @@ Create custom sidecars for application and cronjob
       {{- end }}
     {{- end }}
     {{- end }}
-    {{- range $context.extraVolumeMounts }}
+    {{- range .extraVolumeMounts }}
     {{- if .mountPath }}
     - name: {{ .name }}
       mountPath: {{ .mountPath }}
