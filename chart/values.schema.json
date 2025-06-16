@@ -1231,6 +1231,12 @@
                     ]
                   }
                 ]
+              },
+              "servicePort": {
+                "type": "number",
+                "description": "Ingress service port",
+                "required": [],
+                "examples": [{ "servicePort": 80 }]
               }
             }
           },
@@ -1244,7 +1250,8 @@
                       "path": "/",
                       "pathType": "ImplementationSpecific"
                     }
-                  ]
+                  ],
+                  "servicePort": 80
                 }
               ]
             }
@@ -1310,7 +1317,8 @@
                     "path": "/",
                     "pathType": "ImplementationSpecific"
                   }
-                ]
+                ],
+                "servicePort": 80
               }
             ],
             "tls": [

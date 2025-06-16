@@ -322,6 +322,7 @@ cronjob: []
 #       paths:
 #         - path: /
 #           pathType: ImplementationSpecific
+#       servicePort: 80
 #   tls:
 #     - secretName: chart-example-tls
 #       hosts:

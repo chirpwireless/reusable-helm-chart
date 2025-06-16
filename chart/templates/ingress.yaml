@@ -37,7 +37,7 @@ spec:
               service:
                 name: {{ include "reusable-helm-chart.fullname" $ }}
                 port:
-                  number: {{ $.Values.service.port }}
+                  number: {{ .servicePort }}
           {{- end }}
     {{- end }}
 {{- end }}
