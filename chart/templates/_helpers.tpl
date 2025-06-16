@@ -113,16 +113,6 @@ podAntiAffinity:
 {{- end -}}
 
 {{/*
-Create extra environments
-*/}}
-{{- define "application.extraEnv" -}}
-{{- range .Values.extraEnv }}
-- name: {{ .name }}
-  value: {{ .value | quote }}
-{{- end }}
-{{- end }}
-
-{{/*
 Create custom initContainers for application and cronjob
 */}}
 {{- define "application.initContainers" -}}
