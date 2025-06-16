@@ -51,6 +51,68 @@ global:
     automount: true
     name: ""
 
+# @param dbMigration DB Migration configuration for the chart
+# Example:
+# dbMigration:
+#   enabled: true
+#   image:
+#     repository: liquibase/liquibase
+#     pullPolicy: IfNotPresent
+#     tag: "4.28.0-alpine"
+#   env:
+#     POSTGRES_URL: postgres://user:password@host:5432/db
+#     POSTGRES_USERNAME: user
+#     POSTGRES_PASSWORD: password
+#   command:
+#     - sh
+#     - -c
+#     - |
+#       liquibase \
+#         --search-path=/dbMigration \
+#         update \
+#         --url=$POSTGRES_URL \
+#         --username=$POSTGRES_USERNAME \
+#         --password=$POSTGRES_PASSWORD \
+#         --changelog-file=changeset.sql
+#   args: []
+#   mount:
+#     {}
+#     # /app/test/path/config: "Dummy config"
+#     # /tmp/config: "Config in /tmp"
+#     # /bin/config: "Config in /bin"
+#   resources: {}
+
+dbMigration:
+  enabled: false
+  image:
+    repository: liquibase/liquibase
+    pullPolicy: IfNotPresent
+    tag: "4.28.0-alpine"
+
+  env: {}
+  envFrom: []
+
+  command:
+    - sh
+    - -c
+    - |
+      liquibase \
+        --search-path=/dbMigration \
+        update \
+        --url=$POSTGRES_URL \
+        --username=$POSTGRES_USERNAME \
+        --password=$POSTGRES_PASSWORD \
+        --changelog-file=changeset.sql
+  args: []
+  mount:
+    {}
+    # /app/test/path/config: "Dummy config"
+    # /tmp/config: "Config in /tmp"
+    # /bin/config: "Config in /bin"
+    # /dbMigration/changeset.sql: {{ readFile "../../app/migrations/changeset.sql" | quote }}
+
+  resources: {}
+
 # @param deployment Deployment configuration for the chart
 # Deployment is used by default
 # Example:

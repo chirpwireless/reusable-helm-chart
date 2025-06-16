@@ -1,0 +1,16 @@
+{{- if .Values.dbMigration.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "reusable-helm-chart.fullname" . }}-db-migration
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: before-hook-creation
+  labels:
+    {{- include "reusable-helm-chart.labels" . | nindent 4 }}
+data:
+  {{- range $k, $v := .Values.dbMigration.mount }}
+  {{ base $k }}-{{ sha1sum $k | trunc 8 }}: {{ $v | quote }}
+  {{- end }}
+{{- end }}

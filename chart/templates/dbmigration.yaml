@@ -1,0 +1,73 @@
+{{- if .Values.dbMigration.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ include "reusable-helm-chart.fullname" . }}-db-migration"
+  labels:
+    {{- include "reusable-helm-chart.labels" . | nindent 4 }}
+  annotations:
+    batch.kubernetes.io/job-tracking: ""
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "10"
+    helm.sh/hook-delete-policy: before-hook-creation
+    {{- with .Values.podAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  backoffLimit: 5
+  completionMode: NonIndexed
+  completions: 1
+  parallelism: 1
+  suspend: false
+  template:
+    metadata:
+      labels:
+        {{- include "reusable-helm-chart.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - image: "{{ .Values.dbMigration.image.repository }}:{{ .Values.dbMigration.image.tag }}"
+          imagePullPolicy: {{ .Values.dbMigration.image.pullPolicy }}
+          name: db-migration
+          env:
+          {{- range $key, $value := .Values.dbMigration.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+          {{- end }}
+          {{- with .Values.dbMigration.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.dbMigration.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.dbMigration.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.dbMigration.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            {{- range $k, $v := .Values.dbMigration.mount }}
+            - name: db-migration-files
+              mountPath: {{ $k }}
+              subPath: {{ base $k }}-{{ sha1sum $k | trunc 8 }}
+            {{- end }}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: db-migration-files
+          configMap:
+            name: {{ include "reusable-helm-chart.name" . }}-db-migration
+{{- end }}

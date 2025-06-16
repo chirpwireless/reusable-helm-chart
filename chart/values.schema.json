@@ -295,6 +295,205 @@
         }
       ]
     },
+    "dbMigration": {
+      "type": "object",
+      "description": "Database migration configuration using Liquibase",
+      "required": [],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable database migration job",
+          "required": [],
+          "examples": [{ "enabled": true }]
+        },
+        "image": {
+          "type": "object",
+          "description": "Image configuration for the database migration container",
+          "required": [],
+          "properties": {
+            "repository": {
+              "type": "string",
+              "default": "liquibase/liquibase",
+              "description": "Docker image repository",
+              "required": [],
+              "examples": [{ "repository": "liquibase/liquibase" }]
+            },
+            "pullPolicy": {
+              "type": "string",
+              "default": "IfNotPresent",
+              "description": "Docker image pull policy",
+              "required": [],
+              "examples": [{ "pullPolicy": "IfNotPresent" }]
+            },
+            "tag": {
+              "type": "string",
+              "default": "4.28.0-alpine",
+              "description": "Docker image tag",
+              "required": [],
+              "examples": [{ "tag": "4.28.0-alpine" }]
+            }
+          }
+        },
+        "env": {
+          "type": "object",
+          "description": "Environment variables for the database migration container",
+          "required": [],
+          "properties": {},
+          "examples": [
+            {
+              "env": {
+                "DB_HOST": "postgres",
+                "DB_PORT": "5432"
+              }
+            }
+          ]
+        },
+        "envFrom": {
+          "type": "array",
+          "description": "References to ConfigMaps or Secrets to load environment variables from",
+          "required": [],
+          "items": {
+            "type": "object",
+            "properties": {},
+            "examples": [
+              {
+                "configMapRef": {
+                  "name": "db-config"
+                }
+              },
+              {
+                "secretRef": {
+                  "name": "db-credentials"
+                }
+              }
+            ]
+          }
+        },
+        "command": {
+          "type": "array",
+          "description": "Command to run in the database migration container",
+          "required": [],
+          "items": {
+            "type": "string"
+          },
+          "examples": [
+            {
+              "command": ["sh", "-c", "liquibase update"]
+            }
+          ]
+        },
+        "args": {
+          "type": "array",
+          "description": "Arguments for the command in the database migration container",
+          "required": [],
+          "items": {
+            "type": "string"
+          },
+          "examples": [
+            {
+              "args": ["--changelog-file=changeset.sql"]
+            }
+          ]
+        },
+        "mount": {
+          "type": "object",
+          "description": "Files to mount in the database migration container",
+          "required": [],
+          "properties": {},
+          "examples": [
+            {
+              "mount": {
+                "/dbMigration/changeset.sql": "-- SQL migration content"
+              }
+            }
+          ]
+        },
+        "resources": {
+          "type": "object",
+          "description": "Resource requests and limits for the database migration container",
+          "required": [],
+          "properties": {
+            "limits": {
+              "type": "object",
+              "description": "Resource limits for the database migration container",
+              "required": [],
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "description": "CPU limit",
+                  "required": [],
+                  "examples": [{ "cpu": "100m" }]
+                },
+                "memory": {
+                  "type": "string",
+                  "description": "Memory limit",
+                  "required": [],
+                  "examples": [{ "memory": "128Mi" }]
+                }
+              }
+            },
+            "requests": {
+              "type": "object",
+              "description": "Resource requests for the database migration container",
+              "required": [],
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "description": "CPU request",
+                  "required": [],
+                  "examples": [{ "cpu": "50m" }]
+                },
+                "memory": {
+                  "type": "string",
+                  "description": "Memory request",
+                  "required": [],
+                  "examples": [{ "memory": "64Mi" }]
+                }
+              }
+            }
+          },
+          "examples": [
+            {
+              "resources": {
+                "limits": {
+                  "cpu": "100m",
+                  "memory": "128Mi"
+                },
+                "requests": {
+                  "cpu": "50m",
+                  "memory": "64Mi"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "examples": [
+        {
+          "dbMigration": {
+            "enabled": true,
+            "image": {
+              "repository": "liquibase/liquibase",
+              "pullPolicy": "IfNotPresent",
+              "tag": "4.28.0-alpine"
+            },
+            "env": {
+              "POSTGRES_URL": "jdbc:postgresql://postgres:5432/mydb",
+              "POSTGRES_USERNAME": "postgres"
+            },
+            "command": [
+              "sh",
+              "-c",
+              "liquibase --search-path=/dbMigration update --changelog-file=changeset.sql"
+            ],
+            "mount": {
+              "/dbMigration/changeset.sql": "-- SQL migration content"
+            }
+          }
+        }
+      ]
+    },
     "deployment": {
       "type": "object",
       "description": "The Deployment configuration for the chart",
@@ -1863,6 +2062,26 @@
           "annotations": {},
           "automount": false,
           "name": ""
+        }
+      },
+      "dbMigration": {
+        "enabled": true,
+        "image": {
+          "repository": "liquibase/liquibase",
+          "pullPolicy": "IfNotPresent",
+          "tag": "4.28.0-alpine"
+        },
+        "env": {
+          "POSTGRES_URL": "jdbc:postgresql://postgres:5432/mydb",
+          "POSTGRES_USERNAME": "postgres"
+        },
+        "command": [
+          "sh",
+          "-c",
+          "liquibase --search-path=/dbMigration update --changelog-file=changeset.sql"
+        ],
+        "mount": {
+          "/dbMigration/changeset.sql": "-- SQL migration content"
         }
       },
       "deployment": {
