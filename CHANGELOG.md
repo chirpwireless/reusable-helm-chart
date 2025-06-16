@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.3.2...v1.3.3) (2025-06-16)
+
+
+### Bug Fixes
+
+* remove duplicate extraEnv loop and add resources configuration in container helper template ([bb79556](https://github.com/chirpwireless/reusable-helm-chart/commit/bb79556907333ea25be46effbe536c853172c0e7))
+
 ## [1.3.2](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.3.1...v1.3.2) (2025-06-16)
 
 
