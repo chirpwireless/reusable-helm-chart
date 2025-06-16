@@ -183,10 +183,6 @@ Create custom sidecars for application and cronjob
   image: "{{ .image.repository }}:{{ .image.tag }}"
   imagePullPolicy: {{ .image.pullPolicy }}
   env:
-    {{- range $context.extraEnv }}
-    - name: {{ .name }}
-      value: {{ .value | quote }}
-    {{- end }}
     {{- range .extraEnv }}
     - name: {{ .name }}
       value: {{ .value | quote }}
@@ -238,5 +234,7 @@ Create custom sidecars for application and cronjob
   {{- with .command }}
   command: {{ . }}
   {{- end }}
+  resources:
+    {{- toYaml .resources | nindent 4 }}
 {{- end -}}
 {{- end -}}
