@@ -1,3 +1,16 @@
+# [1.2.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.1.0...v1.2.0) (2025-06-16)
+
+
+### Bug Fixes
+
+* update ingress and service port handling in NOTES.txt ([d50ef5b](https://github.com/chirpwireless/reusable-helm-chart/commit/d50ef5bdf334b2583f717b61caa6ef8dbfa667f6))
+
+
+### Features
+
+* add service port configuration and extra volume mounts to helm chart templates ([df95be3](https://github.com/chirpwireless/reusable-helm-chart/commit/df95be3e8abba79caa5a03a7318e8f0aac0bd8f4))
+* convert ingress from single object to array to support multiple ingress definitions ([90322ae](https://github.com/chirpwireless/reusable-helm-chart/commit/90322ae69da4b41c825bad301121f8460b07c6c3))
+
 # [1.1.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.0.0...v1.1.0) (2025-06-13)
 
 
