@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.2.1...v1.3.0) (2025-06-16)
+
+
+### Bug Fixes
+
+* simplify environment variable handling in helm templates ([f1e85be](https://github.com/chirpwireless/reusable-helm-chart/commit/f1e85be75d3e476147cbcce0909219dbe5bf69de))
+
+
+### Features
+
+* add Liquibase database migration job with configurable settings ([0381dab](https://github.com/chirpwireless/reusable-helm-chart/commit/0381dab010ab45fd5d536cade7c978df2dadb27f))
+
 ## [1.2.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.2.0...v1.2.1) (2025-06-16)
 
 
