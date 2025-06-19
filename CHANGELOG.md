@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.3.3...v1.4.0) (2025-06-19)
+
+
+### Features
+
+* add persistent volume claim support to helm chart ([d25fbf3](https://github.com/chirpwireless/reusable-helm-chart/commit/d25fbf33ae6adda5a37723438af879c8a3b2e975))
+
 ## [1.3.3](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.3.2...v1.3.3) (2025-06-16)
 
 
