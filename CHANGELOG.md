@@ -1,3 +1,11 @@
+## [1.4.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.4.0...v1.4.1) (2025-06-19)
+
+
+### Bug Fixes
+
+* add securityContext support for application containers in helm chart ([4478c3f](https://github.com/chirpwireless/reusable-helm-chart/commit/4478c3fe2fc05144f838f2157fe6428650c4fc90))
+* simplify PVC template by removing labels and updating name suffix ([94db447](https://github.com/chirpwireless/reusable-helm-chart/commit/94db4477b1142c49e7f8ba357e434b421b985306))
+
 # [1.4.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.3.3...v1.4.0) (2025-06-19)
 
 
