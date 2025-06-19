@@ -1,3 +1,10 @@
+## [1.4.3](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.4.2...v1.4.3) (2025-06-19)
+
+
+### Bug Fixes
+
+* add proper indentation to command blocks in Helm templates ([0554ee4](https://github.com/chirpwireless/reusable-helm-chart/commit/0554ee46d6b2595ab9f19ddca13ef4227993b550))
+
 ## [1.4.2](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.4.1...v1.4.2) (2025-06-19)
 
 
