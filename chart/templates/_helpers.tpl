@@ -171,7 +171,8 @@ Create custom initContainers for application and cronjob
     {{- end }}
     {{- end }}
   {{- with .command }}
-  command: {{ . }}
+  command:
+    {{- toYaml . }}
   {{- end }}
 {{- end -}}
 {{- end -}}
@@ -236,7 +237,8 @@ Create custom sidecars for application and cronjob
     {{- end }}
     {{- end }}
   {{- with .command }}
-  command: {{ . }}
+  command:
+    {{- toYaml . }}
   {{- end }}
   resources:
     {{- toYaml .resources | nindent 4 }}

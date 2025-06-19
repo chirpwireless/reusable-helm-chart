@@ -41,7 +41,8 @@ spec:
                 {{- toYaml . | nindent 14 }}
                 {{- end }}
               {{- with .command }}
-              command: {{ . }}
+              command:
+                {{- toYaml . }}
               {{- end }}
               volumeMounts:
                 {{- range .extraMemoryMount }}

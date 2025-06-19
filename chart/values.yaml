@@ -213,9 +213,9 @@ extraVolumeMounts: []
 
 # @param command Command to run in the container
 # Example:
-# command: "echo hello"
+# command: ["/bin/sh", "-c", "echo hello"]
 #
-command: ""
+command: [""]
 
 # @param initContainers List of init containers for the application
 # Example:
@@ -245,7 +245,7 @@ command: ""
 #         mountPath: /mount/path/to
 #         subPath: /if/needed
 #         sizeLimit: 500Mi
-#     command: ""
+#     command: [""]
 #
 initContainers: []
 
@@ -276,7 +276,7 @@ initContainers: []
 #         mountPath: /mount/path/to
 #         subPath: /if/needed
 #         sizeLimit: 500Mi
-#     command: ""
+#     command: [""]
 #
 sidecars: []
 
@@ -366,7 +366,7 @@ service:
 #       mountPath: /mount/path/to
 #       subPath: /if/needed
 #       sizeLimit: 500Mi
-#   command: ""
+#   command: [""]
 #   podAnnotations: {}
 #   nodeSelector: {}
 #

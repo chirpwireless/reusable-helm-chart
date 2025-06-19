@@ -47,7 +47,8 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.command }}
-          command: {{ . }}
+          command:
+            {{- toYaml . }}
           {{- end }}
           ports:
             {{- range .Values.service.ports }}

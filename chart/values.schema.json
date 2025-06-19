@@ -374,6 +374,17 @@
           "type": "array",
           "description": "Command to run in the database migration container",
           "required": [],
+          "default": [
+            "sh",
+            "-c",
+            "liquibase",
+            "--search-path=/dbMigration",
+            "update",
+            "--url=$POSTGRES_URL",
+            "--username=$POSTGRES_USERNAME",
+            "--password=$POSTGRES_PASSWORD",
+            "--changelog-file=changeset.sql"
+          ],
           "items": {
             "type": "string"
           },
@@ -674,11 +685,14 @@
             ]
           },
           "command": {
-            "type": "string",
-            "default": "",
+            "type": "array",
+            "default": [""],
             "description": "Command for init container",
             "required": [],
-            "examples": [{ "command": "/bin/sh -c 'echo Hello World'" }]
+            "items": {
+              "type": "string"
+            },
+            "examples": [{ "command": ["/bin/sh", "-c", "echo Hello World"] }]
           },
           "extraEnv": {
             "$ref": "#/$defs/extraEnv"
@@ -706,7 +720,7 @@
                   "pullPolicy": "IfNotPresent",
                   "tag": "latest"
                 },
-                "command": "/bin/sh -c 'echo Hello World'",
+                "command": ["/bin/sh", "-c", "echo Hello World"],
                 "extraEnvFrom": [
                   {
                     "configMapRef": {
@@ -816,11 +830,14 @@
             ]
           },
           "command": {
-            "type": "string",
-            "default": "",
+            "type": "array",
+            "default": [""],
             "description": "Command for sidecar",
             "required": [],
-            "examples": [{ "command": "/bin/sh -c 'echo Hello World'" }]
+            "items": {
+              "type": "string"
+            },
+            "examples": [{ "command": ["/bin/sh", "-c", "echo Hello World"] }]
           },
           "extraEnv": {
             "$ref": "#/$defs/extraEnv"
@@ -848,7 +865,7 @@
                   "pullPolicy": "IfNotPresent",
                   "tag": "latest"
                 },
-                "command": "/bin/sh -c 'echo Hello World'",
+                "command": ["/bin/sh", "-c", "echo Hello World"],
                 "extraEnvFrom": [
                   {
                     "configMapRef": {
@@ -904,11 +921,14 @@
       }
     },
     "command": {
-      "type": "string",
-      "default": "/bin/sh -c 'echo Hello World'",
+      "type": "array",
+      "default": [""],
       "description": "Command for application container",
       "required": [],
-      "examples": [{ "command": "/bin/sh -c 'echo Hello World'" }]
+      "items": {
+        "type": "string"
+      },
+      "examples": [{ "command": ["/bin/sh", "-c", "echo Hello World"] }]
     },
     "podAnnotations": {
       "type": "object",
@@ -1079,11 +1099,14 @@
             ]
           },
           "command": {
-            "type": "string",
-            "default": "",
+            "type": "array",
+            "default": [""],
             "description": "Command for cronjob pod",
             "required": [],
-            "examples": [{ "command": "my-command.sh" }]
+            "items": {
+              "type": "string"
+            },
+            "examples": [{ "command": ["/bin/sh", "-c", "echo Hello World"] }]
           },
           "schedule": {
             "type": "string",
@@ -1194,11 +1217,15 @@
                   ]
                 },
                 "command": {
-                  "type": "string",
-                  "default": "",
+                  "type": "array",
                   "description": "Command for init container",
                   "required": [],
-                  "examples": [{ "command": "/bin/sh -c 'echo Hello World'" }]
+                  "items": {
+                    "type": "string"
+                  },
+                  "examples": [
+                    { "command": ["/bin/sh", "-c", "echo Hello World"] }
+                  ]
                 },
                 "extraEnv": {
                   "$ref": "#/$defs/extraEnv"
@@ -1226,7 +1253,7 @@
                         "pullPolicy": "IfNotPresent",
                         "tag": "latest"
                       },
-                      "command": "/bin/sh -c 'echo Hello World'",
+                      "command": ["/bin/sh", "-c", "echo Hello World"],
                       "securityContext": {
                         "capabilities": {
                           "drop": ["ALL"]
@@ -1322,7 +1349,7 @@
               "pullPolicy": "IfNotPresent",
               "tag": "latest"
             },
-            "command": "my-command.sh",
+            "command": ["/bin/sh", "-c", "echo Hello World"],
             "extraEnv": [{ "name": "FOO", "value": "BAR" }],
             "extraEnvFrom": [
               {
