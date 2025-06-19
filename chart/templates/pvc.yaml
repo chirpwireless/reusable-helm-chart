@@ -1,0 +1,27 @@
+{{- if .Values.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "reusable-helm-chart.fullname" . }}
+  labels:
+    {{- include "reusable-helm-chart.labels" . | nindent 4 }}
+spec:
+  {{ with .Values.persistence.accessModes }}
+  accessModes:
+    {{ toYaml . | nindent 4 }}
+  {{ end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.size | quote }}
+      
+{{- if .Values.persistence.storageClass }}
+{{- if (eq "-" .Values.persistence.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: {{ .Values.persistence.storageClass | quote }}
+{{- end }}
+{{- end }}
+{{- if .Values.persistence.volumeName }}
+  volumeName: {{ .Values.persistence.volumeName | quote }}
+{{- end }}
+{{- end }}

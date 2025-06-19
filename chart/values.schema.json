@@ -1497,6 +1497,61 @@
         }
       ]
     },
+    "persistence": {
+      "type": "object",
+      "description": "Persistence configuration for the chart",
+      "required": [],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable persistence using PVC",
+          "required": [],
+          "examples": [{ "enabled": true }]
+        },
+        "accessModes": {
+          "type": "array",
+          "description": "PVC access modes",
+          "required": [],
+          "items": {
+            "type": "string"
+          },
+          "examples": [{ "accessModes": ["ReadWriteOnce"] }]
+        },
+        "size": {
+          "type": "string",
+          "default": "15Gi",
+          "description": "PVC storage request size",
+          "required": [],
+          "examples": [{ "size": "15Gi" }]
+        },
+        "storageClass": {
+          "type": "string",
+          "default": "",
+          "description": "PVC storage class name",
+          "required": [],
+          "examples": [{ "storageClass": "standard" }]
+        },
+        "volumeName": {
+          "type": "string",
+          "default": "",
+          "description": "Existing PV name to use",
+          "required": [],
+          "examples": [{ "volumeName": "my-volume" }]
+        }
+      },
+      "examples": [
+        {
+          "persistence": {
+            "enabled": true,
+            "accessModes": ["ReadWriteOnce"],
+            "size": "15Gi",
+            "storageClass": "standard",
+            "volumeName": "my-volume"
+          }
+        }
+      ]
+    },
     "resources": {
       "type": "object",
       "description": "Resources for the application",
@@ -2123,6 +2178,13 @@
       },
       "cronjob": [],
       "ingress": [],
+      "persistence": {
+        "enabled": true,
+        "accessModes": ["ReadWriteOnce"],
+        "size": "15Gi",
+        "storageClass": "standard",
+        "volumeName": "my-volume"
+      },
       "resources": {
         "limits": {
           "memory": "2000Mi"

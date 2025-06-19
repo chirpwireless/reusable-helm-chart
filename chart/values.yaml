@@ -407,6 +407,24 @@ cronjob: []
 #
 ingress: []
 
+# @param persistence Persistence configuration for the chart
+# Example:
+# persistence:
+#   enabled: true
+#   accessModes:
+#     - ReadWriteOnce
+#   size: 15Gi
+#   storageClass: ""
+#   volumeName: ""
+#
+persistence:
+  enabled: false
+  accessModes:
+    - ReadWriteOnce
+  size: 15Gi
+  storageClass: ""
+  volumeName: ""
+
 # @param resources Resources for the application
 # Example:
 # resources:
