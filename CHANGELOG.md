@@ -1,3 +1,11 @@
+## [1.4.2](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.4.1...v1.4.2) (2025-06-19)
+
+
+### Bug Fixes
+
+* update command field defaults from empty string array to empty array ([748ce9d](https://github.com/chirpwireless/reusable-helm-chart/commit/748ce9df0aa28e60edfddb388aeaff0116ea7548))
+* update command fields to use array type instead of string in Helm chart ([570d4c1](https://github.com/chirpwireless/reusable-helm-chart/commit/570d4c148d859316208219e78b9a7ffb45242d23))
+
 ## [1.4.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.4.0...v1.4.1) (2025-06-19)
 
 
