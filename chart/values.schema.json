@@ -1175,6 +1175,24 @@
                     }
                   ]
                 },
+                "securityContext": {
+                  "type": "object",
+                  "description": "Security context for the application container",
+                  "required": [],
+                  "properties": {},
+                  "examples": [
+                    {
+                      "securityContext": {
+                        "capabilities": {
+                          "drop": ["ALL"]
+                        },
+                        "readOnlyRootFilesystem": "true",
+                        "runAsNonRoot": "true",
+                        "runAsUser": "1000"
+                      }
+                    }
+                  ]
+                },
                 "command": {
                   "type": "string",
                   "default": "",
@@ -1209,6 +1227,14 @@
                         "tag": "latest"
                       },
                       "command": "/bin/sh -c 'echo Hello World'",
+                      "securityContext": {
+                        "capabilities": {
+                          "drop": ["ALL"]
+                        },
+                        "readOnlyRootFilesystem": "true",
+                        "runAsNonRoot": "true",
+                        "runAsUser": "1000"
+                      },
                       "extraEnvFrom": [
                         {
                           "configMapRef": {

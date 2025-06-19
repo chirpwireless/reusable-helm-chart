@@ -225,6 +225,7 @@ command: ""
 #       repository: ""
 #       pullPolicy: IfNotPresent
 #       tag: ""
+#     securityContext: {}
 #     extraEnv:
 #       - name: FOO
 #         value: "bar"

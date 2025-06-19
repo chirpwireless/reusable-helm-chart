@@ -122,6 +122,10 @@ Create custom initContainers for application and cronjob
 - name: {{ .name }}
   image: "{{ .image.repository }}:{{ .image.tag }}"
   imagePullPolicy: {{ .image.pullPolicy }}
+  {{ with .securityContext }}
+  securityContext:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   env:
     {{- range $context.extraEnv }}
     - name: {{ .name }}
