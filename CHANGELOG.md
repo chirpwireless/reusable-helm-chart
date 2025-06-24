@@ -1,3 +1,10 @@
+## [1.4.4](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.4.3...v1.4.4) (2025-06-24)
+
+
+### Bug Fixes
+
+* add external secrets support for database migrations ([7573ccc](https://github.com/chirpwireless/reusable-helm-chart/commit/7573ccc9843cc193c219c428b994c4f0e24d6cca))
+
 ## [1.4.3](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.4.2...v1.4.3) (2025-06-19)
 
 
