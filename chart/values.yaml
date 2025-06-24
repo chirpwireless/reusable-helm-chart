@@ -63,6 +63,16 @@ global:
 #     POSTGRES_URL: postgres://user:password@host:5432/db
 #     POSTGRES_USERNAME: user
 #     POSTGRES_PASSWORD: password
+#   externalSecrets:
+#     name-of-the-secret:
+#       # Name of the secret store
+#       secretStoreName: vault-backend
+#       # Path to vault secret
+#       secretPath: path/to/secret
+#       properties:
+#         # Mapping vault_property: secret_property
+#         property1: secret_property1
+#         property2: secret_property2
 #   command:
 #     - sh
 #     - -c
@@ -91,7 +101,7 @@ dbMigration:
 
   env: {}
   envFrom: []
-
+  externalSecrets: {}
   command:
     - sh
     - -c
