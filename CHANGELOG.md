@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.5.0...v1.5.1) (2025-06-26)
+
+
+### Bug Fixes
+
+* add dynamic volume binding to PVC template using lookup function ([35aece6](https://github.com/chirpwireless/reusable-helm-chart/commit/35aece67d604b2dc95b18fa39ce6052dca119b27))
+
 # [1.5.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.4.5...v1.5.0) (2025-06-26)
 
 
