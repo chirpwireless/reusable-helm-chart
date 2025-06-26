@@ -426,6 +426,10 @@ ingress: []
 #     - ReadWriteOnce
 #   size: 15Gi
 #   storageClass: ""
+# Note: The PVC is created with the 'helm.sh/resource-policy: keep' annotation,
+# which prevents Helm from deleting or modifying it during upgrades.
+# This is necessary because PVCs are immutable after creation except for
+# resources.requests and volumeAttributesClassName fields.
 #
 persistence:
   enabled: false

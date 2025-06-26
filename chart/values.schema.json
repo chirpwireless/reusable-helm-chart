@@ -1592,8 +1592,7 @@
             "enabled": true,
             "accessModes": ["ReadWriteOnce"],
             "size": "15Gi",
-            "storageClass": "standard",
-            "volumeName": "my-volume"
+            "storageClass": "standard"
           }
         }
       ]
@@ -2228,8 +2227,7 @@
         "enabled": true,
         "accessModes": ["ReadWriteOnce"],
         "size": "15Gi",
-        "storageClass": "standard",
-        "volumeName": "my-volume"
+        "storageClass": "standard"
       },
       "resources": {
         "limits": {

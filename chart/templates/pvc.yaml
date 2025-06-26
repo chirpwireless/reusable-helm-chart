@@ -3,6 +3,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ include "reusable-helm-chart.fullname" . }}-pvc
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   {{- with .Values.persistence.accessModes }}
   accessModes:
