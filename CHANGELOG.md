@@ -1,3 +1,10 @@
+## [1.4.5](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.4.4...v1.4.5) (2025-06-26)
+
+
+### Bug Fixes
+
+* remove volumeName option from persistence configuration in Helm chart ([4f34c7d](https://github.com/chirpwireless/reusable-helm-chart/commit/4f34c7d643481f538a611de6d5ddad4849cf9c48))
+
 ## [1.4.4](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.4.3...v1.4.4) (2025-06-24)
 
 
