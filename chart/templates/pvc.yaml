@@ -3,8 +3,6 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ include "reusable-helm-chart.fullname" . }}-pvc
-  annotations:
-    helm.sh/resource-policy: keep
 spec:
   {{- with .Values.persistence.accessModes }}
   accessModes:
@@ -20,5 +18,10 @@ spec:
 {{- else }}
   storageClassName: {{ .Values.persistence.storageClass | quote }}
 {{- end }}
+{{- end }}
+{{- $pvcName := printf "%s-pvc" (include "reusable-helm-chart.fullname" .) }}
+{{- $existingPVC := lookup "v1" "PersistentVolumeClaim" .Release.Namespace $pvcName }}
+{{- if and $existingPVC $existingPVC.spec.volumeName }}
+  volumeName: {{ $existingPVC.spec.volumeName }}
 {{- end }}
 {{- end }}
