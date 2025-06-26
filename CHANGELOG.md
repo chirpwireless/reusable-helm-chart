@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.4.5...v1.5.0) (2025-06-26)
+
+
+### Features
+
+* add keep annotation to PVC and remove volumeName field from schema ([1fffac2](https://github.com/chirpwireless/reusable-helm-chart/commit/1fffac280677ad4d07e60935430c93e08629ca37))
+
 ## [1.4.5](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.4.4...v1.4.5) (2025-06-26)
 
 
