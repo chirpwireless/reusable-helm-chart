@@ -426,7 +426,6 @@ ingress: []
 #     - ReadWriteOnce
 #   size: 15Gi
 #   storageClass: ""
-#   volumeName: ""
 #
 persistence:
   enabled: false
@@ -434,7 +433,6 @@ persistence:
     - ReadWriteOnce
   size: 15Gi
   storageClass: ""
-  volumeName: ""
 
 # @param resources Resources for the application
 # Example:

@@ -1584,13 +1584,6 @@
           "description": "PVC storage class name",
           "required": [],
           "examples": [{ "storageClass": "standard" }]
-        },
-        "volumeName": {
-          "type": "string",
-          "default": "",
-          "description": "Existing PV name to use",
-          "required": [],
-          "examples": [{ "volumeName": "my-volume" }]
         }
       },
       "examples": [

@@ -19,7 +19,4 @@ spec:
   storageClassName: {{ .Values.persistence.storageClass | quote }}
 {{- end }}
 {{- end }}
-{{- if .Values.persistence.volumeName }}
-  volumeName: {{ .Values.persistence.volumeName | quote }}
-{{- end }}
 {{- end }}
