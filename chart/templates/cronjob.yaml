@@ -33,16 +33,22 @@ spec:
               image: "{{ .image.repository }}:{{ .image.tag }}"
               imagePullPolicy: {{ .image.pullPolicy }}
               env:
+                {{- with $.Values.extraEnv }}
+                {{- toYaml . | nindent 16 }}
+                {{- end }}
                 {{- with .extraEnv }}
                 {{- toYaml . | nindent 16 }}
                 {{- end }}
               envFrom:
+                {{- with $.Values.extraEnvFrom }}
+                {{- toYaml . | nindent 16 }}
+                {{- end }}
                 {{- with .extraEnvFrom }}
-                {{- toYaml . | nindent 14 }}
+                {{- toYaml . | nindent 16 }}
                 {{- end }}
               {{- with .command }}
               command:
-                {{- toYaml . | nindent 14 }}
+                {{- toYaml . | nindent 16 }}
               {{- end }}
               volumeMounts:
                 {{- range .extraMemoryMount }}
