@@ -63,7 +63,7 @@ spec:
                   {{- end }}
                 {{- end }}
                 {{- end }}
-                {{- range .Values.extraVolumeMounts }}
+                {{- range $.Values.extraVolumeMounts }}
                 {{- if .mountPath }}
                 - name: {{ .name }}
                   mountPath: {{ .mountPath }}
@@ -93,7 +93,7 @@ spec:
                 name: {{ template "reusable-helm-chart.fullname" $ }}-{{ .name }}
             {{- end }}
             {{- end }}
-            {{- range .Values.extraVolumeMounts }}
+            {{- range $.Values.extraVolumeMounts }}
             {{- if .mountPath }}
             - name: {{ .name }}
               {{- toYaml .volumeSource | nindent 14 }}
