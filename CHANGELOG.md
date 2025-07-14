@@ -1,3 +1,10 @@
+## [1.5.3](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.5.2...v1.5.3) (2025-07-14)
+
+
+### Bug Fixes
+
+* Update cronjob extra env variables ([cd5b5b4](https://github.com/chirpwireless/reusable-helm-chart/commit/cd5b5b40eb466259e599329c70de2f0c0f2b083a))
+
 ## [1.5.2](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.5.1...v1.5.2) (2025-07-14)
 
 
