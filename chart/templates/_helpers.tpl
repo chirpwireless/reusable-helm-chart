@@ -38,6 +38,11 @@ app.kubernetes.io/release: {{ .Release.Name | trunc 63 | trimSuffix "-" | trimSu
 app.kubernetes.io/namespace: {{ .Release.Namespace }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | replace "+" "_" | trunc 63 | trimSuffix "-" | trimSuffix "."  | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{ with .Values.externalSecrets }}
+{{- range $key, $value := .}}
+kyverno.io/watch-secret: {{ $key }}
+{{- end }}
+{{- end }}
 {{- end -}}
 
 {{/*
