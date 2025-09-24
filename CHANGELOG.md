@@ -1,3 +1,11 @@
+# [1.6.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.5.3...v1.6.0) (2025-09-24)
+
+
+### Features
+
+* add args parameter to Helm chart for container command arguments ([6c699ac](https://github.com/chirpwireless/reusable-helm-chart/commit/6c699acc14a2bc027966c99337933363eb044c6c))
+* add kyverno.io/watch-secret label for deployments ([47c1a78](https://github.com/chirpwireless/reusable-helm-chart/commit/47c1a78f24e8183cb9810b28c91ffe1346e75bca))
+
 ## [1.5.3](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.5.2...v1.5.3) (2025-07-14)
 
 
