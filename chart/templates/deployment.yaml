@@ -50,6 +50,10 @@ spec:
           command:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             {{- range .Values.service.ports }}
             - name: {{ .name }}

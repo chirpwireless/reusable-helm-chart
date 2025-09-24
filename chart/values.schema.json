@@ -930,6 +930,16 @@
       },
       "examples": [{ "command": ["/bin/sh", "-c", "echo Hello World"] }]
     },
+    "args": {
+      "type": "array",
+      "default": [""],
+      "description": "Arguments for application container",
+      "required": [],
+      "items": {
+        "type": "string"
+      },
+      "examples": [{ "args": ["arg1", "arg2"] }]
+    },
     "podAnnotations": {
       "type": "object",
       "description": "Annotations object for application",
@@ -2206,6 +2216,7 @@
       "extraMemoryMount": [],
       "extraVolumeMounts": [],
       "command": "/bin/sh -c 'echo Hello World'",
+      "args": ["arg1", "arg2"],
       "podAnnotations": {
         "application.framework": "golang"
       },

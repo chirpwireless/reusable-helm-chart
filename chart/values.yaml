@@ -227,6 +227,12 @@ extraVolumeMounts: []
 #
 command: []
 
+# @param args Arguments to pass to the command
+# Example:
+# args: ["arg1", "arg2"]
+#
+args: []
+
 # @param initContainers List of init containers for the application
 # Example:
 # initContainers:
