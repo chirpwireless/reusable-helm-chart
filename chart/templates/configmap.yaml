@@ -14,3 +14,16 @@ data:
   {{ base $k }}-{{ sha1sum $k | trunc 8 }}: {{ $v | quote }}
   {{- end }}
 {{- end }}
+
+{{- if .Values.extraFileMount -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "reusable-helm-chart.fullname" . }}-file-mount
+  labels:
+    {{- include "reusable-helm-chart.labels" . | nindent 4 }}
+data:
+  {{- range $k, $v := .Values.extraFileMount }}
+  {{ base $k }}-{{ sha1sum $k | trunc 8 }}: {{ $v | quote }}
+  {{- end }}
+{{- end -}}

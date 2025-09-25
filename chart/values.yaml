@@ -221,6 +221,14 @@ extraMemoryMount: []
 #
 extraVolumeMounts: []
 
+# @param extraFileMount Extra file mounts for application container
+# Example:
+# extraFileMount:
+#   /app/test/path/config: "Dummy config"
+#   /tmp/config: "Config in /tmp"
+#   /bin/config: "Config in /bin"
+extraFileMount: {}
+
 # @param command Command to run in the container
 # Example:
 # command: ["/bin/sh", "-c", "echo hello"]

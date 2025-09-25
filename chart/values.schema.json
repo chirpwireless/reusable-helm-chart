@@ -630,6 +630,9 @@
     "extraVolumeMounts": {
       "$ref": "#/$defs/extraVolumeMounts"
     },
+    "extraFileMount": {
+      "$ref": "#/$defs/extraFileMount"
+    },
     "initContainers": {
       "type": "array",
       "description": "List of init containers for the application",
@@ -2215,6 +2218,7 @@
       "extraEnvFrom": [],
       "extraMemoryMount": [],
       "extraVolumeMounts": [],
+      "extraFileMount": {},
       "command": "/bin/sh -c 'echo Hello World'",
       "args": ["arg1", "arg2"],
       "podAnnotations": {
@@ -2663,6 +2667,20 @@
           }
         ]
       }
+    },
+    "extraFileMount": {
+      "type": "object",
+      "description": "Extra file mounts for application container",
+      "required": [],
+      "examples": [
+        {
+          "extraFileMount": {
+            "/app/test/path/config": "Dummy config",
+            "/tmp/config": "Config in /tmp",
+            "/bin/config": "Config in /bin"
+          }
+        }
+      ]
     }
   }
 }

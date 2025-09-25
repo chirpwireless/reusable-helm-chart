@@ -88,6 +88,11 @@ spec:
               {{- end }}
             {{- end }}
             {{- end }}
+            {{- range $k, $v := .Values.extraFileMount }}
+              - name: configs
+                mountPath: {{ $k }}
+                subPath: {{ base $k }}-{{ sha1sum $k | trunc 8 }}
+            {{- end }}
           startupProbe:
             {{- toYaml .Values.startupProbe | nindent 12 }}
           livenessProbe:
@@ -127,4 +132,9 @@ spec:
         - name: {{ .name }}
           {{- toYaml .volumeSource | nindent 10 }}
         {{- end }}
+        {{- if .Values.extraFileMount }}
+        - name: configs
+          configMap:
+            name: {{ include "reusable-helm-chart.fullname" . }}-file-mount
+      {{- end }}
 {{- end }}
