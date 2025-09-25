@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.6.0...v1.7.0) (2025-09-25)
+
+
+### Features
+
+* add extraFileMount support for mounting config files in helm chart ([dd9bc9c](https://github.com/chirpwireless/reusable-helm-chart/commit/dd9bc9c1b9c3e0753cb624b659c3add53f06147d))
+
 # [1.6.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.5.3...v1.6.0) (2025-09-24)
 
 
