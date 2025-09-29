@@ -319,6 +319,66 @@ sidecars: []
 #       property2: secret_property2
 externalSecrets: {}
 
+# @param mongodb MongoDB configuration for the application
+# Name of the MongoDB cluster
+# name: mongodb
+# Number of MongoDB replicas
+# replicaCount: 3
+# Version of MongoDB cluster
+# version: 7.0.7
+# Users to create in MongoDB
+# users:
+#   - name: my-user
+#     db: admin
+#     passwordSecretRef: # a reference to the secret that will be used to generate the user's password
+#       name: mongodb-my-user-password
+#     roles:
+#       - name: clusterAdmin
+#         db: admin
+#       - name: userAdminAnyDatabase
+#         db: admin
+#     scramCredentialsSecretName: my-scram
+#     connectionStringSecretNamespace: other-namespace
+# Roles to create in MongoDB
+# roles:
+#   - role: testRole
+#     db: admin
+#     privileges:
+#       - resource:
+#           db: "test"
+#           collection: "" # an empty string indicates any collection
+#         actions:
+#           - find
+#     roles: []
+# External secrets to use with MongoDB
+# Default resources to allocate for the MongoDB pods
+# resources:
+#   mongod: {}
+#   agent: {}
+# Storage settings for MongoDB
+# storage:
+#   data: 10Gi
+#   logs: 2Gi
+
+# Example:
+mongodb:
+  enabled: false
+
+  name: mongodb
+  replicaCount: 3
+  version: 7.0.7
+
+  users: []
+  roles: []
+
+  resources:
+    mongod: {}
+    agent: {}
+
+  storage:
+    data: 10Gi
+    logs: 2Gi
+
 # @param podAnnotations Annotations object for application
 # Example:
 # podAnnotations:

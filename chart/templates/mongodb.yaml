@@ -1,0 +1,74 @@
+{{ if .Values.mongodb.enabled }}
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: {{ .Values.mongodb.name }}
+spec:
+  members: {{ .Values.mongodb.replicaCount }}
+  type: ReplicaSet
+  version: "{{ .Values.mongodb.version }}"
+  security:
+    authentication:
+      ignoreUnknownUsers: true # users can be added to the deployment through other sources. (not through the CRD) and will not be removed by the agent.
+      modes: ["SCRAM"]
+    {{- with .Values.mongodb.roles }}
+    roles:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- with .Values.mongodb.users }}
+  users:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  additionalMongodConfig:
+    storage.wiredTiger.engineConfig.journalCompressor: zlib
+  statefulSet:
+    # NOTE: Overwriting the "app" labelSelectors via the sts wrapper is not supported since this labelselector is not
+    # getting propagated to the service. You can add others like defined below
+    spec:
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: {{ .Values.mongodb.name }}
+          velero.io/backup: enabled
+      template:
+        metadata:
+          # label the pod which is used by the "labelSelector" in podAntiAffinty
+          # you can label it witch some other labels as well -- make sure it change the podAntiAffinity labelselector accordingly
+          labels:
+            app.kubernetes.io/name: {{ .Values.mongodb.name }}
+            velero.io/backup: enabled
+        spec:
+          # resources can be specified by applying an override
+          # per container name.
+          containers:
+            - name: mongod
+              resources:
+                {{- toYaml .Values.mongodb.resources.mongod | nindent 16 }}
+            - name: mongodb-agent
+              resources:
+                {{- toYaml .Values.mongodb.resources.agent | nindent 16 }}
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - {{ .Values.mongodb.name }}
+                    topologyKey: kubernetes.io/hostname
+      volumeClaimTemplates:
+        - metadata:
+            name: data-volume
+          spec:
+            resources:
+              requests:
+                storage: {{ .Values.mongodb.storage.data }}
+        - metadata:
+            name: logs-volume
+          spec:
+            resources:
+              requests:
+                storage: {{ .Values.mongodb.storage.logs }}
+{{ end }}
