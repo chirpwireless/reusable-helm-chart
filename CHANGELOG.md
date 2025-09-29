@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.7.0...v1.8.0) (2025-09-29)
+
+
+### Features
+
+* add MongoDB configuration options to Helm chart values ([28c8848](https://github.com/chirpwireless/reusable-helm-chart/commit/28c8848045645ba62629d326cb178ec40a781fb5))
+
 # [1.7.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.6.0...v1.7.0) (2025-09-25)
 
 
