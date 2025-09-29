@@ -505,6 +505,146 @@
         }
       ]
     },
+    "mongodb": {
+      "type": "object",
+      "description": "MongoDB configuration for the application",
+      "required": [],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable MongoDB deployment",
+          "required": [],
+          "examples": [{ "enabled": true }]
+        },
+        "name": {
+          "type": "string",
+          "default": "mongodb",
+          "description": "Name of the MongoDB cluster",
+          "required": [],
+          "examples": [{ "name": "mongodb" }]
+        },
+        "replicaCount": {
+          "type": "integer",
+          "default": 3,
+          "minimum": 1,
+          "description": "Number of MongoDB replicas",
+          "required": [],
+          "examples": [{ "replicaCount": 3 }]
+        },
+        "version": {
+          "type": "string",
+          "default": "7.0.7",
+          "description": "Version of MongoDB cluster",
+          "required": [],
+          "examples": [{ "version": "7.0.7" }]
+        },
+        "users": {
+          "type": "array",
+          "description": "Users to create in MongoDB",
+          "required": [],
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string", "description": "Username" },
+              "db": { "type": "string", "description": "Database name" },
+              "passwordSecretRef": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "description": "Secret name" }
+                }
+              },
+              "roles": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "db": { "type": "string" }
+                  }
+                }
+              },
+              "scramCredentialsSecretName": { "type": "string" },
+              "connectionStringSecretNamespace": { "type": "string" }
+            }
+          }
+        },
+        "roles": {
+          "type": "array",
+          "description": "Roles to create in MongoDB",
+          "required": [],
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": { "type": "string" },
+              "db": { "type": "string" },
+              "privileges": { "type": "array", "items": { "type": "object" } },
+              "roles": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "resources": {
+          "type": "object",
+          "description": "Default resources to allocate for the MongoDB pods",
+          "required": [],
+          "properties": {
+            "mongod": {
+              "type": "object",
+              "description": "Resources for mongod container",
+              "required": [],
+              "properties": {}
+            },
+            "agent": {
+              "type": "object",
+              "description": "Resources for mongodb-agent container",
+              "required": [],
+              "properties": {}
+            }
+          }
+        },
+        "storage": {
+          "type": "object",
+          "description": "Storage settings for MongoDB",
+          "required": [],
+          "properties": {
+            "data": {
+              "type": "string",
+              "default": "10Gi",
+              "description": "Storage size for data volume",
+              "required": [],
+              "examples": [{ "data": "10Gi" }]
+            },
+            "logs": {
+              "type": "string",
+              "default": "2Gi",
+              "description": "Storage size for logs volume",
+              "required": [],
+              "examples": [{ "logs": "2Gi" }]
+            }
+          }
+        }
+      },
+      "examples": [
+        {
+          "mongodb": {
+            "enabled": true,
+            "name": "mongodb",
+            "replicaCount": 3,
+            "version": "7.0.7",
+            "users": [],
+            "roles": [],
+            "resources": {
+              "mongod": {},
+              "agent": {}
+            },
+            "storage": {
+              "data": "10Gi",
+              "logs": "2Gi"
+            }
+          }
+        }
+      ]
+    },
     "deployment": {
       "type": "object",
       "description": "The Deployment configuration for the chart",
@@ -2195,6 +2335,22 @@
         ],
         "mount": {
           "/dbMigration/changeset.sql": "-- SQL migration content"
+        }
+      },
+      "mongodb": {
+        "enabled": true,
+        "name": "mongodb",
+        "replicaCount": 3,
+        "version": "7.0.7",
+        "users": [],
+        "roles": [],
+        "resources": {
+          "mongod": {},
+          "agent": {}
+        },
+        "storage": {
+          "data": "10Gi",
+          "logs": "2Gi"
         }
       },
       "deployment": {
