@@ -1,3 +1,11 @@
+## [1.8.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.8.0...v1.8.1) (2025-10-01)
+
+
+### Bug Fixes
+
+* add MongoDB configuration schema and move values section ([f03f569](https://github.com/chirpwireless/reusable-helm-chart/commit/f03f569f7371e978efc4bc862b439de3d4e55b1f))
+* correct path to extraMemoryMount values in deployment template ([288056d](https://github.com/chirpwireless/reusable-helm-chart/commit/288056d93f580bc409d7110630745fda48336ea1))
+
 # [1.8.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.7.0...v1.8.0) (2025-09-29)
 
 
