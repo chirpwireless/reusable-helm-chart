@@ -120,7 +120,7 @@ spec:
             name: {{ template "reusable-helm-chart.fullname" $ }}-{{ .name }}
         {{- end }}
         {{- end }}
-        {{- range .extraMemoryMount }}
+        {{- range .Values.extraMemoryMount }}
         {{- if .mountPath }}
         - name: memory-{{ .name }}
           emptyDir:
