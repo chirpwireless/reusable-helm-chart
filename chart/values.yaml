@@ -428,6 +428,7 @@ service:
 
 # @param cronjob list
 # Example:
+# cronjob:
 # - name: cronjob-name
 #   image:
 #     repository: ""
