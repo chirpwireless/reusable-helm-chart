@@ -384,6 +384,22 @@ sidecars: []
 #       property2: secret_property2
 externalSecrets: {}
 
+# @param extraSecrets Additional secrets to create for the application
+# Example:
+# extraSecrets:
+#   - name: my-app-secrets
+#     type: Opaque
+#     data:
+#       DATABASE_URL: "postgres://user:password@localhost:5432/mydb"
+#       API_KEY: "my-secret-api-key"
+#       JWT_SECRET: "jwt-signing-secret"
+#   - name: tls-certificates
+#     type: kubernetes.io/tls
+#     data:
+#       tls.crt: "base64-encoded-cert"
+#       tls.key: "base64-encoded-key"
+extraSecrets: []
+
 # @param podAnnotations Annotations object for application
 # Example:
 # podAnnotations:
