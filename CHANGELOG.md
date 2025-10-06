@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.8.1...v1.9.0) (2025-10-06)
+
+
+### Features
+
+* add support for external and extra secrets in Helm chart ([aa6660e](https://github.com/chirpwireless/reusable-helm-chart/commit/aa6660edbc19e4f7ffd30d99e9f2f5949d26cfdf))
+
 ## [1.8.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.8.0...v1.8.1) (2025-10-01)
 
 
