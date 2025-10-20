@@ -1,3 +1,15 @@
+# [1.10.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.9.0...v1.10.0) (2025-10-20)
+
+
+### Bug Fixes
+
+* correct indentation level for resources block in cronjob template from 14 to 16 spaces ([01291bf](https://github.com/chirpwireless/reusable-helm-chart/commit/01291bfa280e0ac2154f6fd534fb9b5b430aba46))
+
+
+### Features
+
+* add resource limits and file mount support to cronjob template ([876e9d7](https://github.com/chirpwireless/reusable-helm-chart/commit/876e9d78c61583b4ffaa290a39c6330615e73c3d))
+
 # [1.9.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.8.1...v1.9.0) (2025-10-06)
 
 
