@@ -52,7 +52,7 @@ spec:
               {{- end }}
               {{- with .resources }}
               resources:
-                {{- toYaml . | nindent 14 }}
+                {{- toYaml . | nindent 16 }}
               {{- end }}
               volumeMounts:
                 {{- range .extraMemoryMount }}
