@@ -117,7 +117,7 @@ spec:
             {{- if $.Values.extraFileMount }}
             - name: configs
               configMap:
-                name: {{ include "reusable-helm-chart.fullname" . }}-file-mount
+                name: {{ include "reusable-helm-chart.fullname" $ }}-file-mount
             {{- end }}
 ---
 {{- end }}
