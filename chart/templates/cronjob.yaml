@@ -50,6 +50,10 @@ spec:
               command:
                 {{- toYaml . | nindent 16 }}
               {{- end }}
+              {{- with .resources }}
+              resources:
+                {{- toYaml . | nindent 14 }}
+              {{- end }}
               volumeMounts:
                 {{- range .extraMemoryMount }}
                 {{- if .mountPath }}
@@ -78,6 +82,11 @@ spec:
                   {{- end }}
                 {{- end }}
                 {{- end }}
+                {{- range $k, $v := $.Values.extraFileMount }}
+                - name: configs
+                  mountPath: {{ $k }}
+                  subPath: {{ base $k }}-{{ sha1sum $k | trunc 8 }}
+                {{- end }}
           restartPolicy: OnFailure
         {{- with .nodeSelector }}
           nodeSelector:
@@ -104,6 +113,11 @@ spec:
             - name: {{ .name }}
               {{- toYaml .volumeSource | nindent 14 }}
             {{- end }}
+            {{- end }}
+            {{- if $.Values.extraFileMount }}
+            - name: configs
+              configMap:
+                name: {{ include "reusable-helm-chart.fullname" . }}-file-mount
             {{- end }}
 ---
 {{- end }}
