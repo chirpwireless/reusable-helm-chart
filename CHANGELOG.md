@@ -1,3 +1,10 @@
+## [1.10.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.10.0...v1.10.1) (2025-10-21)
+
+
+### Bug Fixes
+
+* use correct scope reference for configMap name in cronjob template ([6f15b00](https://github.com/chirpwireless/reusable-helm-chart/commit/6f15b00425d30bdda15fa509225048860e8b2770))
+
 # [1.10.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.9.0...v1.10.0) (2025-10-20)
 
 
