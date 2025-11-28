@@ -69,5 +69,5 @@ spec:
       volumes:
         - name: db-migration-files
           configMap:
-            name: {{ include "reusable-helm-chart.name" . }}-db-migration
+            name: {{ include "reusable-helm-chart.fullname" . }}-db-migration
 {{- end }}

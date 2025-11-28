@@ -93,14 +93,22 @@ spec:
               mountPath: {{ $k }}
               subPath: {{ base $k }}-{{ sha1sum $k | trunc 8 }}
             {{- end }}
+          {{- with .Values.startupProbe }}
           startupProbe:
-            {{- toYaml .Values.startupProbe | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.livenessProbe }}
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
         {{- include "application.sidecars" (list . .Values) | nindent 8 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -129,8 +137,10 @@ spec:
         {{- end }}
         {{- end }}
         {{- range .Values.extraVolumeMounts }}
+        {{- if .mountPath }}
         - name: {{ .name }}
           {{- toYaml .volumeSource | nindent 10 }}
+        {{- end }}
         {{- end }}
         {{- if .Values.extraFileMount }}
         - name: configs

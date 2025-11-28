@@ -245,7 +245,9 @@ Create custom sidecars for application and cronjob
   command:
     {{- toYaml . | nindent 2 }}
   {{- end }}
+  {{- with .resources }}
   resources:
-    {{- toYaml .resources | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end -}}
 {{- end -}}

@@ -3,6 +3,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ include "reusable-helm-chart.fullname" . }}-pvc
+  labels:
+    {{- include "reusable-helm-chart.labels" . | nindent 4 }}
   annotations:
     "helm.sh/resource-policy": keep
     {{- with .Values.persistence.annotations }}
