@@ -128,6 +128,15 @@ spec:
             name: {{ template "reusable-helm-chart.fullname" $ }}-{{ .name }}
         {{- end }}
         {{- end }}
+        {{- range .Values.initContainers }}
+        {{- range .extraConfigMap }}
+        {{- if .mountPath }}
+        - name: configmap-{{ .name }}
+          configMap:
+            name: {{ template "reusable-helm-chart.fullname" $ }}-{{ .name }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
         {{- range .Values.extraMemoryMount }}
         {{- if .mountPath }}
         - name: memory-{{ .name }}
