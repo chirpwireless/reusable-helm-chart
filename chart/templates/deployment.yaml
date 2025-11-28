@@ -36,7 +36,7 @@ spec:
         - name: application
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.extraEnv }}
           env:
@@ -89,9 +89,9 @@ spec:
             {{- end }}
             {{- end }}
             {{- range $k, $v := .Values.extraFileMount }}
-              - name: configs
-                mountPath: {{ $k }}
-                subPath: {{ base $k }}-{{ sha1sum $k | trunc 8 }}
+            - name: configs
+              mountPath: {{ $k }}
+              subPath: {{ base $k }}-{{ sha1sum $k | trunc 8 }}
             {{- end }}
           startupProbe:
             {{- toYaml .Values.startupProbe | nindent 12 }}

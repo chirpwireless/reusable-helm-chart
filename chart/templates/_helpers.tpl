@@ -36,7 +36,7 @@ app.kubernetes.io/type: application
 app.kubernetes.io/chart: {{ .Chart.Name | trunc 63 | trimSuffix "-" | trimSuffix "."  }}
 app.kubernetes.io/release: {{ .Release.Name | trunc 63 | trimSuffix "-" | trimSuffix "."  }}
 app.kubernetes.io/namespace: {{ .Release.Namespace }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | replace "+" "_" | trunc 63 | trimSuffix "-" | trimSuffix "."  | quote }}
+app.kubernetes.io/version: {{ .Values.image.tag | default .Chart.AppVersion | replace "+" "_" | trunc 63 | trimSuffix "-" | trimSuffix "."  | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
@@ -169,6 +169,11 @@ Create custom initContainers for application and cronjob
       subPath: {{ .subPath }}
       {{- end }}
     {{- end }}
+    {{- end }}
+    {{- range $k, $v := $top.Values.extraFileMount }}
+    - name: configs
+      mountPath: {{ $k }}
+      subPath: {{ base $k }}-{{ sha1sum $k | trunc 8 }}
     {{- end }}
   {{- with .command }}
   command:
