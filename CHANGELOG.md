@@ -1,3 +1,12 @@
+## [1.10.3](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.10.2...v1.10.3) (2025-11-28)
+
+
+### Bug Fixes
+
+* Add PVC annotations ([f0a1256](https://github.com/chirpwireless/reusable-helm-chart/commit/f0a1256ec55a0d90969a7eb94e8e032f5c539664))
+* Mount init container config maps ([c39edd7](https://github.com/chirpwireless/reusable-helm-chart/commit/c39edd79b728f5c9ef134dc5cd92288d00751df3))
+* Small fixes ([955a928](https://github.com/chirpwireless/reusable-helm-chart/commit/955a92897ed83d02d1d0e3d8225544da38bdfd1f))
+
 ## [1.10.2](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.10.1...v1.10.2) (2025-11-28)
 
 
