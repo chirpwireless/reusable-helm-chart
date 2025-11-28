@@ -518,6 +518,8 @@ ingress: []
 # Example:
 # persistence:
 #   enabled: true
+#   annotations:
+#     backup.velero.io/backup-volumes: "true"
 #   accessModes:
 #     - ReadWriteOnce
 #   size: 15Gi
@@ -529,6 +531,7 @@ ingress: []
 #
 persistence:
   enabled: false
+  annotations: {}
   accessModes:
     - ReadWriteOnce
   size: 15Gi
