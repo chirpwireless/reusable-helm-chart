@@ -179,6 +179,10 @@ Create custom initContainers for application and cronjob
   command:
     {{- toYaml . | nindent 2 }}
   {{- end }}
+  {{- with .resources }}
+  resources:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end -}}
 {{- end -}}
 

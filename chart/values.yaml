@@ -335,6 +335,7 @@ args: []
 #         subPath: /if/needed
 #         sizeLimit: 500Mi
 #     command: []
+#     resources: {}
 #
 initContainers: []
 
