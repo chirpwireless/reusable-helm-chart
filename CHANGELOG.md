@@ -1,3 +1,10 @@
+## [1.10.4](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.10.3...v1.10.4) (2025-11-28)
+
+
+### Bug Fixes
+
+* Add resources for init containers ([77b007b](https://github.com/chirpwireless/reusable-helm-chart/commit/77b007b78d86d170d47aab873ef7eadf2e1104b9))
+
 ## [1.10.3](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.10.2...v1.10.3) (2025-11-28)
 
 
