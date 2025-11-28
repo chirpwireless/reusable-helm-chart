@@ -1,3 +1,10 @@
+## [1.10.2](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.10.1...v1.10.2) (2025-11-28)
+
+
+### Bug Fixes
+
+* Small fixes ([3aae68f](https://github.com/chirpwireless/reusable-helm-chart/commit/3aae68f59d60a57cc86f28a5582568c4faaf0ecd))
+
 ## [1.10.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.10.0...v1.10.1) (2025-10-21)
 
 
