@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.10.4...v1.11.0) (2026-01-06)
+
+
+### Features
+
+* Switch external-secrets.io api version to v1 ([88a0aa7](https://github.com/chirpwireless/reusable-helm-chart/commit/88a0aa72c32d99024f96a61294ec5a9513a73f2e))
+
 ## [1.10.4](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.10.3...v1.10.4) (2025-11-28)
 
 
