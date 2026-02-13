@@ -335,6 +335,26 @@
             }
           }
         },
+        "externalSecrets": {
+          "type": "object",
+          "description": "External secrets for the database migration",
+          "required": [],
+          "properties": {},
+          "examples": [
+            {
+              "externalSecrets": {
+                "name-of-the-secret": {
+                  "secretStoreName": "vault-backend",
+                  "secretPath": "path/to/secret",
+                  "properties": {
+                    "property1": "secret_property1",
+                    "property2": "secret_property2"
+                  }
+                }
+              }
+            }
+          ]
+        },
         "env": {
           "type": "object",
           "description": "Environment variables for the database migration container",
@@ -1162,6 +1182,19 @@
           "required": [],
           "examples": [{ "type": "ClusterIP" }]
         },
+        "annotations": {
+          "type": "object",
+          "description": "Kubernetes annotations for the Service",
+          "required": [],
+          "properties": {},
+          "examples": [
+            {
+              "annotations": {
+                "nginx.ingress.kubernetes.io/proxy-read-timeout": "3600"
+              }
+            }
+          ]
+        },
         "ports": {
           "type": "array",
           "description": "Service ports",
@@ -1584,6 +1617,317 @@
         }
       ]
     },
+    "httpRoutes": {
+      "type": "array",
+      "description": "List of HTTPRoute objects for the application (Gateway API)",
+      "required": [],
+      "items": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "nameSuffix": {
+            "type": "string",
+            "default": "",
+            "description": "Suffix to append to the HTTPRoute name for uniqueness",
+            "required": [],
+            "examples": [{ "nameSuffix": "api" }]
+          },
+          "parentRefs": {
+            "type": "array",
+            "description": "Parent references for the HTTPRoute (Gateway references)",
+            "required": [],
+            "items": {
+              "type": "object",
+              "required": ["name", "namespace"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name of the parent Gateway",
+                  "required": [],
+                  "examples": [{ "name": "internal" }]
+                },
+                "namespace": {
+                  "type": "string",
+                  "description": "Namespace of the parent Gateway",
+                  "required": [],
+                  "examples": [{ "namespace": "envoy-gateway-system" }]
+                },
+                "sectionName": {
+                  "type": "string",
+                  "description": "Section name of the parent Gateway listener",
+                  "required": [],
+                  "examples": [{ "sectionName": "https" }]
+                }
+              }
+            }
+          },
+          "hostnames": {
+            "type": "array",
+            "description": "Hostnames for the HTTPRoute",
+            "required": [],
+            "items": {
+              "type": "string"
+            },
+            "examples": [{ "hostnames": ["my-app.gw.dev.chirpwireless.io"] }]
+          },
+          "annotations": {
+            "type": "object",
+            "description": "Kubernetes annotations for the HTTPRoute",
+            "required": [],
+            "properties": {},
+            "examples": []
+          },
+          "rules": {
+            "type": "array",
+            "description": "Routing rules for the HTTPRoute",
+            "required": [],
+            "items": {
+              "type": "object",
+              "properties": {
+                "matches": {
+                  "type": "array",
+                  "description": "Match conditions for the rule",
+                  "required": [],
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "path": {
+                        "type": "string",
+                        "description": "Path to match",
+                        "required": [],
+                        "examples": [{ "path": "/" }]
+                      },
+                      "pathType": {
+                        "type": "string",
+                        "description": "Type of path matching",
+                        "required": [],
+                        "examples": [{ "pathType": "PathPrefix" }]
+                      }
+                    }
+                  }
+                },
+                "servicePort": {
+                  "type": "integer",
+                  "description": "Backend service port",
+                  "required": [],
+                  "examples": [{ "servicePort": 8080 }]
+                }
+              }
+            }
+          },
+          "rateLimit": {
+            "type": "object",
+            "description": "Rate limiting configuration (creates BackendTrafficPolicy)",
+            "required": [],
+            "properties": {
+              "rules": {
+                "type": "array",
+                "description": "Rate limit rules",
+                "required": [],
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "requests": {
+                      "type": "integer",
+                      "description": "Number of requests allowed",
+                      "required": [],
+                      "examples": [{ "requests": 100 }]
+                    },
+                    "unit": {
+                      "type": "string",
+                      "description": "Time unit for the rate limit",
+                      "required": [],
+                      "examples": [{ "unit": "Minute" }]
+                    },
+                    "clientSelectors": {
+                      "type": "array",
+                      "description": "Client selectors for the rate limit rule",
+                      "required": [],
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "headers": {
+                            "type": "array",
+                            "description": "Header-based client selectors",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "description": "Header name"
+                                },
+                                "type": {
+                                  "type": "string",
+                                  "description": "Header match type",
+                                  "examples": ["Distinct"]
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "examples": [
+              {
+                "rateLimit": {
+                  "rules": [
+                    { "requests": 100, "unit": "Minute" },
+                    {
+                      "requests": 10,
+                      "unit": "Second",
+                      "clientSelectors": [
+                        {
+                          "headers": [
+                            { "name": "x-api-key", "type": "Distinct" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "auth": {
+            "type": "object",
+            "description": "Authentication configuration (creates SecurityPolicy)",
+            "required": [],
+            "properties": {
+              "jwt": {
+                "type": "object",
+                "description": "JWT validation configuration",
+                "required": [],
+                "properties": {
+                  "providers": {
+                    "type": "array",
+                    "description": "JWT providers",
+                    "required": [],
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Provider name"
+                        },
+                        "issuer": {
+                          "type": "string",
+                          "description": "JWT issuer URL"
+                        },
+                        "jwksUri": {
+                          "type": "string",
+                          "description": "JWKS URI for key verification"
+                        },
+                        "claimToHeaders": {
+                          "type": "array",
+                          "description": "Map JWT claims to request headers",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "header": {
+                                "type": "string",
+                                "description": "Header name to set"
+                              },
+                              "claim": {
+                                "type": "string",
+                                "description": "JWT claim to extract"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": [
+                  {
+                    "jwt": {
+                      "providers": [
+                        {
+                          "name": "zitadel",
+                          "issuer": "https://your-zitadel.zitadel.cloud",
+                          "jwksUri": "https://your-zitadel.zitadel.cloud/oauth/v2/keys",
+                          "claimToHeaders": [
+                            { "header": "x-user-id", "claim": "sub" }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "oidc": {
+                "type": "object",
+                "description": "OIDC configuration (redirect to login page)",
+                "required": [],
+                "properties": {
+                  "issuer": {
+                    "type": "string",
+                    "description": "OIDC issuer URL"
+                  },
+                  "clientID": {
+                    "type": "string",
+                    "description": "OIDC client ID"
+                  },
+                  "clientSecretName": {
+                    "type": "string",
+                    "description": "Name of the Kubernetes secret containing the OIDC client secret"
+                  },
+                  "redirectURL": {
+                    "type": "string",
+                    "description": "Redirect URL after authentication"
+                  },
+                  "scopes": {
+                    "type": "array",
+                    "description": "OIDC scopes to request",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": [
+                  {
+                    "oidc": {
+                      "issuer": "https://your-zitadel.zitadel.cloud",
+                      "clientID": "your-client-id",
+                      "clientSecretName": "zitadel-oidc-secret",
+                      "redirectURL": "https://my-app.gw.dev.chirpwireless.io/oauth2/callback",
+                      "scopes": ["openid", "profile", "email"]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "examples": [
+        {
+          "httpRoutes": [
+            {
+              "nameSuffix": "api",
+              "parentRefs": [
+                {
+                  "name": "internal",
+                  "namespace": "envoy-gateway-system",
+                  "sectionName": "https"
+                }
+              ],
+              "hostnames": ["my-app.gw.dev.chirpwireless.io"],
+              "rules": [
+                {
+                  "matches": [{ "path": "/", "pathType": "PathPrefix" }],
+                  "servicePort": 8080
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
     "ingress": {
       "type": "array",
       "description": "List of Ingress objects for the application",
@@ -1737,6 +2081,19 @@
           "description": "Enable persistence using PVC",
           "required": [],
           "examples": [{ "enabled": true }]
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Kubernetes annotations for the PVC",
+          "required": [],
+          "properties": {},
+          "examples": [
+            {
+              "annotations": {
+                "backup.velero.io/backup-volumes": "true"
+              }
+            }
+          ]
         },
         "accessModes": {
           "type": "array",
@@ -2278,6 +2635,101 @@
           "required": [],
           "examples": [{ "targetCPUUtilizationPercentage": 80 }]
         },
+        "behavior": {
+          "type": "object",
+          "description": "Autoscaling behavior configuration for scale up and scale down",
+          "required": [],
+          "properties": {
+            "scaleUp": {
+              "type": "object",
+              "description": "Scale up behavior configuration",
+              "required": [],
+              "properties": {
+                "stabilizationWindowSeconds": {
+                  "type": "integer",
+                  "description": "Stabilization window in seconds before scaling up",
+                  "required": [],
+                  "examples": [{ "stabilizationWindowSeconds": 300 }]
+                },
+                "policies": {
+                  "type": "array",
+                  "description": "Scale up policies",
+                  "required": [],
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Policy type (Percent or Pods)"
+                      },
+                      "value": {
+                        "type": "integer",
+                        "description": "Policy value"
+                      },
+                      "periodSeconds": {
+                        "type": "integer",
+                        "description": "Period in seconds for the policy"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "scaleDown": {
+              "type": "object",
+              "description": "Scale down behavior configuration",
+              "required": [],
+              "properties": {
+                "stabilizationWindowSeconds": {
+                  "type": "integer",
+                  "description": "Stabilization window in seconds before scaling down",
+                  "required": [],
+                  "examples": [{ "stabilizationWindowSeconds": 600 }]
+                },
+                "policies": {
+                  "type": "array",
+                  "description": "Scale down policies",
+                  "required": [],
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Policy type (Percent or Pods)"
+                      },
+                      "value": {
+                        "type": "integer",
+                        "description": "Policy value"
+                      },
+                      "periodSeconds": {
+                        "type": "integer",
+                        "description": "Period in seconds for the policy"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "examples": [
+            {
+              "behavior": {
+                "scaleUp": {
+                  "stabilizationWindowSeconds": 300,
+                  "policies": [
+                    { "type": "Percent", "value": 100, "periodSeconds": 60 }
+                  ]
+                },
+                "scaleDown": {
+                  "stabilizationWindowSeconds": 600,
+                  "policies": [
+                    { "type": "Pods", "value": 1, "periodSeconds": 600 }
+                  ]
+                }
+              }
+            }
+          ]
+        },
         "targetMemoryUtilizationPercentage": {
           "type": "integer",
           "default": 80,
@@ -2416,6 +2868,7 @@
         ]
       },
       "cronjob": [],
+      "httpRoutes": [],
       "ingress": [],
       "persistence": {
         "enabled": true,
@@ -2469,6 +2922,19 @@
         "enabled": false,
         "minReplicas": 2,
         "maxReplicas": 10,
+        "behavior": {
+          "scaleUp": {
+            "stabilizationWindowSeconds": 300,
+            "policies": [
+              { "type": "Percent", "value": 100, "periodSeconds": 60 }
+            ]
+          },
+          "scaleDown": {
+            "stabilizationWindowSeconds": 600,
+            "policies": [{ "type": "Pods", "value": 1, "periodSeconds": 600 }]
+          }
+        },
+        "targetCPUUtilizationPercentage": 80,
         "targetMemoryUtilizationPercentage": 80
       },
       "nodeSelector": {},

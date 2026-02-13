@@ -114,8 +114,7 @@ dbMigration:
         --password=$POSTGRES_PASSWORD \
         --changelog-file=changeset.sql
   args: []
-  mount:
-    {}
+  mount: {}
     # /app/test/path/config: "Dummy config"
     # /tmp/config: "Config in /tmp"
     # /bin/config: "Config in /bin"
@@ -518,6 +517,57 @@ cronjob: []
 #           - chart-example.local
 #
 ingress: []
+
+# @param httpRoutes List of HTTPRoute objects for the application (Gateway API)
+# Example:
+# httpRoutes:
+#   - nameSuffix: "api"
+#     parentRefs:
+#       - name: internal
+#         namespace: envoy-gateway-system
+#         sectionName: https
+#     hostnames:
+#       - my-app.gw.dev.chirpwireless.io
+#     rules:
+#       - matches:
+#           - path: /
+#             pathType: PathPrefix
+#         servicePort: 8080
+#     # Optional: rate limiting (creates BackendTrafficPolicy)
+#     rateLimit:
+#       rules:
+#         - requests: 100
+#           unit: Minute
+#         - requests: 10
+#           unit: Second
+#           clientSelectors:
+#             - headers:
+#                 - name: x-api-key
+#                   type: Distinct
+#     # Optional: auth (creates SecurityPolicy)
+#     # JWT validation:
+#     auth:
+#       jwt:
+#         providers:
+#           - name: zitadel
+#             issuer: https://your-zitadel.zitadel.cloud
+#             jwksUri: https://your-zitadel.zitadel.cloud/oauth/v2/keys
+#             claimToHeaders:
+#               - header: x-user-id
+#                 claim: sub
+#     # OR OIDC (redirect to login page):
+#     # auth:
+#     #   oidc:
+#     #     issuer: https://your-zitadel.zitadel.cloud
+#     #     clientID: your-client-id
+#     #     clientSecretName: zitadel-oidc-secret
+#     #     redirectURL: https://my-app.gw.dev.chirpwireless.io/oauth2/callback
+#     #     scopes:
+#     #       - openid
+#     #       - profile
+#     #       - email
+#
+httpRoutes: []
 
 # @param persistence Persistence configuration for the chart
 # Example:
