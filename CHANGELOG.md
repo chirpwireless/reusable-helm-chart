@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.11.0...v1.12.0) (2026-02-13)
+
+
+### Features
+
+* Add Gateway API support with HTTPRoute, rate limiting, and authentication ([48932b1](https://github.com/chirpwireless/reusable-helm-chart/commit/48932b18194b03a2f8b8c07d668955f83dbe1249))
+
 # [1.11.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.10.4...v1.11.0) (2026-01-06)
 
 
