@@ -1,3 +1,10 @@
+## [1.12.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.12.0...v1.12.1) (2026-02-16)
+
+
+### Bug Fixes
+
+* Change rate limiting from Global to Local in BackendTrafficPolicy ([65d799f](https://github.com/chirpwireless/reusable-helm-chart/commit/65d799fa4c2fa1316239f3ec8cac2313ea9c62ae))
+
 # [1.12.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.11.0...v1.12.0) (2026-02-13)
 
 
