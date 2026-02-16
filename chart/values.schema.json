@@ -1717,7 +1717,7 @@
           },
           "rateLimit": {
             "type": "object",
-            "description": "Rate limiting configuration (creates BackendTrafficPolicy)",
+            "description": "Local rate limiting configuration (creates BackendTrafficPolicy). Per-Envoy-instance. Global rate limiting requires a dedicated rate limit service and is not supported here.",
             "required": [],
             "properties": {
               "rules": {

@@ -533,7 +533,9 @@ ingress: []
 #           - path: /
 #             pathType: PathPrefix
 #         servicePort: 8080
-#     # Optional: rate limiting (creates BackendTrafficPolicy)
+#     # Optional: local rate limiting (creates BackendTrafficPolicy)
+#     # Note: Local rate limiting is per-Envoy-instance. Global rate limiting
+#     # requires a dedicated rate limit service (e.g. Redis) and is not supported here.
 #     rateLimit:
 #       rules:
 #         - requests: 100

@@ -12,8 +12,8 @@ spec:
       kind: HTTPRoute
       name: {{ include "reusable-helm-chart.fullname" $ }}{{ if .nameSuffix }}-{{ .nameSuffix }}{{ end }}
   rateLimit:
-    type: Global
-    global:
+    type: Local
+    local:
       rules:
         {{- range .rateLimit.rules }}
         - limit:
