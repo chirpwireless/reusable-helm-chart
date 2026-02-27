@@ -1,5 +1,4 @@
-{{- with .Values.natsStreamsConsumers }}
-{{- range $key, $value := . }}
+{{- range $key, $value := .Values.natsStreamsConsumers }}
 ---
 apiVersion: jetstream.nats.io/v1beta2
 kind: Consumer
@@ -11,7 +10,7 @@ spec:
   durableName: {{ $key }}
   streamName: {{ $value.streamName }}
   {{- with $value.description }}
-  description: {{ . }}
+  description: {{ . | quote }}
   {{- end }}
   {{- with $value.deliverPolicy }}
   deliverPolicy: {{ . }}
@@ -38,5 +37,4 @@ spec:
   {{- with $value.replayPolicy }}
   replayPolicy: {{ . }}
   {{- end }}
-{{- end }}
 {{- end }}

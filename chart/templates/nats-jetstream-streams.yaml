@@ -1,5 +1,4 @@
-{{- with .Values.natsStreams }}
-{{- range $key, $value := . }}
+{{- range $key, $value := .Values.natsStreams }}
 ---
 apiVersion: jetstream.nats.io/v1beta2
 kind: Stream
@@ -10,7 +9,7 @@ metadata:
 spec:
   name: {{ $key }}
   {{- with $value.description }}
-  description: {{ . }}
+  description: {{ . | quote }}
   {{- end }}
   subjects:
     {{- toYaml $value.subjects | nindent 4 }}
@@ -42,5 +41,4 @@ spec:
   {{- with $value.duplicateWindow }}
   duplicateWindow: {{ . }}
   {{- end }}
-{{- end }}
 {{- end }}
