@@ -2751,6 +2751,200 @@
         }
       ]
     },
+    "natsStreams": {
+      "type": "object",
+      "description": "NATS JetStream Streams to create. Each key is the stream name.",
+      "required": [],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["subjects"],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Description of the stream",
+            "required": [],
+            "examples": [{ "description": "My event stream" }]
+          },
+          "subjects": {
+            "type": "array",
+            "description": "List of subjects the stream listens to",
+            "items": {
+              "type": "string"
+            },
+            "examples": [{ "subjects": ["events.>"] }]
+          },
+          "storage": {
+            "type": "string",
+            "default": "file",
+            "description": "Storage type for the stream (file or memory)",
+            "pattern": "^(file|memory)$",
+            "required": [],
+            "examples": [{ "storage": "file" }]
+          },
+          "retention": {
+            "type": "string",
+            "description": "Retention policy (limits, interest, or workqueue)",
+            "pattern": "^(limits|interest|workqueue)$",
+            "required": [],
+            "examples": [{ "retention": "limits" }]
+          },
+          "replicas": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Number of stream replicas for high availability",
+            "required": [],
+            "examples": [{ "replicas": 3 }]
+          },
+          "maxAge": {
+            "type": "string",
+            "description": "Maximum age of messages in the stream (e.g. 72h, 7d)",
+            "required": [],
+            "examples": [{ "maxAge": "72h" }]
+          },
+          "maxBytes": {
+            "type": "integer",
+            "description": "Maximum total bytes for the stream (-1 for unlimited)",
+            "required": [],
+            "examples": [{ "maxBytes": -1 }]
+          },
+          "maxMsgSize": {
+            "type": "integer",
+            "description": "Maximum size of a single message (-1 for unlimited)",
+            "required": [],
+            "examples": [{ "maxMsgSize": -1 }]
+          },
+          "maxMsgs": {
+            "type": "integer",
+            "description": "Maximum number of messages in the stream (-1 for unlimited)",
+            "required": [],
+            "examples": [{ "maxMsgs": -1 }]
+          },
+          "maxConsumers": {
+            "type": "integer",
+            "description": "Maximum number of consumers for the stream (-1 for unlimited)",
+            "required": [],
+            "examples": [{ "maxConsumers": -1 }]
+          },
+          "discard": {
+            "type": "string",
+            "description": "Discard policy when limits are reached (old or new)",
+            "pattern": "^(old|new)$",
+            "required": [],
+            "examples": [{ "discard": "old" }]
+          },
+          "duplicateWindow": {
+            "type": "string",
+            "description": "Window for duplicate message detection (e.g. 2m)",
+            "required": [],
+            "examples": [{ "duplicateWindow": "2m" }]
+          }
+        }
+      },
+      "examples": [
+        {
+          "natsStreams": {
+            "my-stream": {
+              "description": "My event stream",
+              "subjects": ["events.>"],
+              "storage": "file",
+              "retention": "limits",
+              "replicas": 3,
+              "maxAge": "72h"
+            }
+          }
+        }
+      ]
+    },
+    "natsStreamsConsumers": {
+      "type": "object",
+      "description": "NATS JetStream Consumers to create. Each key is the consumer name.",
+      "required": [],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["streamName"],
+        "properties": {
+          "streamName": {
+            "type": "string",
+            "description": "Name of the stream this consumer subscribes to",
+            "examples": [{ "streamName": "my-stream" }]
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the consumer",
+            "required": [],
+            "examples": [{ "description": "My event consumer" }]
+          },
+          "deliverPolicy": {
+            "type": "string",
+            "description": "Deliver policy (all, last, new, byStartSequence, byStartTime)",
+            "required": [],
+            "examples": [{ "deliverPolicy": "all" }]
+          },
+          "ackPolicy": {
+            "type": "string",
+            "description": "Acknowledgement policy (explicit, none, all)",
+            "required": [],
+            "examples": [{ "ackPolicy": "explicit" }]
+          },
+          "ackWait": {
+            "type": "string",
+            "description": "Duration to wait for acknowledgement (e.g. 30s)",
+            "required": [],
+            "examples": [{ "ackWait": "30s" }]
+          },
+          "maxAckPending": {
+            "type": "integer",
+            "description": "Maximum number of unacknowledged messages",
+            "required": [],
+            "examples": [{ "maxAckPending": 1000 }]
+          },
+          "maxDeliver": {
+            "type": "integer",
+            "description": "Maximum number of delivery attempts",
+            "required": [],
+            "examples": [{ "maxDeliver": 5 }]
+          },
+          "filterSubject": {
+            "type": "string",
+            "description": "Subject filter for the consumer",
+            "required": [],
+            "examples": [{ "filterSubject": "events.created" }]
+          },
+          "filterSubjects": {
+            "type": "array",
+            "description": "Multiple subject filters for the consumer",
+            "required": [],
+            "items": {
+              "type": "string"
+            },
+            "examples": [
+              { "filterSubjects": ["events.created", "events.updated"] }
+            ]
+          },
+          "replayPolicy": {
+            "type": "string",
+            "description": "Replay policy (instant or original)",
+            "required": [],
+            "examples": [{ "replayPolicy": "instant" }]
+          }
+        }
+      },
+      "examples": [
+        {
+          "natsStreamsConsumers": {
+            "my-consumer": {
+              "streamName": "my-stream",
+              "description": "My event consumer",
+              "deliverPolicy": "all",
+              "ackPolicy": "explicit",
+              "ackWait": "30s",
+              "maxAckPending": 1000,
+              "filterSubject": "events.created"
+            }
+          }
+        }
+      ]
+    },
     "nodeSelector": {
       "type": "object",
       "description": "NodeSelector for the application",
@@ -2937,6 +3131,8 @@
         "targetCPUUtilizationPercentage": 80,
         "targetMemoryUtilizationPercentage": 80
       },
+      "natsStreams": {},
+      "natsStreamsConsumers": {},
       "nodeSelector": {},
       "tolerations": []
     }

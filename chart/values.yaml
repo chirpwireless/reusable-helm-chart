@@ -718,6 +718,42 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+# @param natsStreams NATS JetStream Streams to create
+# Example:
+# natsStreams:
+#   my-stream:
+#     description: "My event stream"
+#     subjects:
+#       - "events.>"
+#     storage: file
+#     retention: limits
+#     replicas: 3
+#     maxAge: 72h
+#     maxBytes: -1
+#     maxMsgSize: -1
+#     maxMsgs: -1
+#     maxConsumers: -1
+#     discard: old
+#     duplicateWindow: 2m
+#
+natsStreams: {}
+
+# @param natsStreamsConsumers NATS JetStream Consumers to create
+# Example:
+# natsStreamsConsumers:
+#   my-consumer:
+#     streamName: my-stream
+#     description: "My event consumer"
+#     deliverPolicy: all
+#     ackPolicy: explicit
+#     ackWait: 30s
+#     maxAckPending: 1000
+#     maxDeliver: 5
+#     filterSubject: "events.created"
+#     replayPolicy: instant
+#
+natsStreamsConsumers: {}
+
 # @param nodeSelector NodeSelector for the application
 # Example:
 # nodeSelector: {}

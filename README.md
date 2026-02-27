@@ -11,6 +11,7 @@ A flexible and reusable Helm chart for deploying applications on Kubernetes.
 - Support for environment variables, secrets, and config maps
 - Ingress configuration with TLS support
 - Service configuration with multiple port options
+- NATS JetStream Stream and Consumer management
 
 ## Installation
 
@@ -42,18 +43,60 @@ helm install my-release chirpwireless/reusable-helm-chart -f values.yaml
 
 The following table lists the configurable parameters of the chart and their default values.
 
-| Parameter            | Description           | Default        |
-| -------------------- | --------------------- | -------------- |
-| `image.repository`   | Image repository      | `nginx`        |
-| `image.tag`          | Image tag             | `latest`       |
-| `image.pullPolicy`   | Image pull policy     | `IfNotPresent` |
-| `service.type`       | Service type          | `ClusterIP`    |
-| `service.port`       | Service port          | `80`           |
-| `ingress.enabled`    | Enable ingress        | `false`        |
-| `resources.limits`   | Pod resource limits   | `{}`           |
-| `resources.requests` | Pod resource requests | `{}`           |
+| Parameter              | Description              | Default        |
+| ---------------------- | ------------------------ | -------------- |
+| `image.repository`     | Image repository         | `nginx`        |
+| `image.tag`            | Image tag                | `latest`       |
+| `image.pullPolicy`     | Image pull policy        | `IfNotPresent` |
+| `service.type`         | Service type             | `ClusterIP`    |
+| `service.port`         | Service port             | `80`           |
+| `ingress.enabled`      | Enable ingress           | `false`        |
+| `resources.limits`     | Pod resource limits      | `{}`           |
+| `resources.requests`   | Pod resource requests    | `{}`           |
+| `natsStreams`          | NATS JetStream Streams   | `{}`           |
+| `natsStreamsConsumers` | NATS JetStream Consumers | `{}`           |
 
 For a complete list of parameters, see the [values.yaml](./values.yaml) file.
+
+## NATS JetStream
+
+The chart supports creating NATS JetStream Stream and Consumer resources via the [NATS JetStream Controller](https://github.com/nats-io/nack) CRDs (`jetstream.nats.io/v1beta2`).
+
+### Streams
+
+Define streams your application needs to publish to or consume from:
+
+```yaml
+natsStreams:
+  my-events:
+    description: "Application event stream"
+    subjects:
+      - "events.>"
+    storage: file
+    retention: limits
+    replicas: 3
+    maxAge: 72h
+```
+
+### Consumers
+
+Define durable consumers that subscribe to streams:
+
+```yaml
+natsStreamsConsumers:
+  my-consumer:
+    streamName: my-events
+    description: "Process created events"
+    deliverPolicy: all
+    ackPolicy: explicit
+    ackWait: 30s
+    maxAckPending: 1000
+    maxDeliver: 5
+    filterSubject: "events.created"
+    replayPolicy: instant
+```
+
+All fields except the map key and `subjects` (Stream) / `streamName` (Consumer) are optional.
 
 ## Health Probes
 

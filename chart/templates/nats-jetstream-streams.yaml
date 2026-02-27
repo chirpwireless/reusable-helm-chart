@@ -1,0 +1,46 @@
+{{- with .Values.natsStreams }}
+{{- range $key, $value := . }}
+---
+apiVersion: jetstream.nats.io/v1beta2
+kind: Stream
+metadata:
+  name: {{ $key }}
+  labels:
+    {{- include "reusable-helm-chart.labels" $ | nindent 4 }}
+spec:
+  name: {{ $key }}
+  {{- with $value.description }}
+  description: {{ . }}
+  {{- end }}
+  subjects:
+    {{- toYaml $value.subjects | nindent 4 }}
+  storage: {{ $value.storage | default "file" }}
+  {{- with $value.retention }}
+  retention: {{ . }}
+  {{- end }}
+  {{- with $value.replicas }}
+  replicas: {{ . }}
+  {{- end }}
+  {{- with $value.maxAge }}
+  maxAge: {{ . }}
+  {{- end }}
+  {{- with $value.maxBytes }}
+  maxBytes: {{ . }}
+  {{- end }}
+  {{- with $value.maxMsgSize }}
+  maxMsgSize: {{ . }}
+  {{- end }}
+  {{- with $value.maxMsgs }}
+  maxMsgs: {{ . }}
+  {{- end }}
+  {{- with $value.maxConsumers }}
+  maxConsumers: {{ . }}
+  {{- end }}
+  {{- with $value.discard }}
+  discard: {{ . }}
+  {{- end }}
+  {{- with $value.duplicateWindow }}
+  duplicateWindow: {{ . }}
+  {{- end }}
+{{- end }}
+{{- end }}

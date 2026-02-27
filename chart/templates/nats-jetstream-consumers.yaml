@@ -1,0 +1,42 @@
+{{- with .Values.natsStreamsConsumers }}
+{{- range $key, $value := . }}
+---
+apiVersion: jetstream.nats.io/v1beta2
+kind: Consumer
+metadata:
+  name: {{ $key }}
+  labels:
+    {{- include "reusable-helm-chart.labels" $ | nindent 4 }}
+spec:
+  durableName: {{ $key }}
+  streamName: {{ $value.streamName }}
+  {{- with $value.description }}
+  description: {{ . }}
+  {{- end }}
+  {{- with $value.deliverPolicy }}
+  deliverPolicy: {{ . }}
+  {{- end }}
+  {{- with $value.ackPolicy }}
+  ackPolicy: {{ . }}
+  {{- end }}
+  {{- with $value.ackWait }}
+  ackWait: {{ . }}
+  {{- end }}
+  {{- with $value.maxAckPending }}
+  maxAckPending: {{ . }}
+  {{- end }}
+  {{- with $value.maxDeliver }}
+  maxDeliver: {{ . }}
+  {{- end }}
+  {{- with $value.filterSubject }}
+  filterSubject: {{ . }}
+  {{- end }}
+  {{- with $value.filterSubjects }}
+  filterSubjects:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $value.replayPolicy }}
+  replayPolicy: {{ . }}
+  {{- end }}
+{{- end }}
+{{- end }}
