@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.12.1...v1.13.0) (2026-02-27)
+
+
+### Features
+
+* Add NATS JetStream Stream and Consumer support ([abf1bc7](https://github.com/chirpwireless/reusable-helm-chart/commit/abf1bc731263d9649b6baf972f3c17a4df80922c))
+
 ## [1.12.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.12.0...v1.12.1) (2026-02-16)
 
 
