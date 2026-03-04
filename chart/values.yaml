@@ -722,6 +722,7 @@ autoscaling:
 # Example:
 # natsStreams:
 #   my-stream:
+#     name: MY-STREAM
 #     description: "My event stream"
 #     subjects:
 #       - "events.>"
@@ -742,6 +743,7 @@ natsStreams: {}
 # Example:
 # natsStreamsConsumers:
 #   my-consumer:
+#     name: MY-CONSUMER
 #     streamName: my-stream
 #     description: "My event consumer"
 #     deliverPolicy: all

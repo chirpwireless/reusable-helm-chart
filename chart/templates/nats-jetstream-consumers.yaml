@@ -7,7 +7,7 @@ metadata:
   labels:
     {{- include "reusable-helm-chart.labels" $ | nindent 4 }}
 spec:
-  durableName: {{ $key }}
+  durableName: {{ $value.name | default $key }}
   streamName: {{ $value.streamName }}
   {{- with $value.description }}
   description: {{ . | quote }}
