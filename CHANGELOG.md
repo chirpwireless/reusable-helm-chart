@@ -1,3 +1,15 @@
+# [1.14.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.13.0...v1.14.0) (2026-03-04)
+
+
+### Bug Fixes
+
+* Simplify NATS JetStream template logic and quote description fields ([d84b240](https://github.com/chirpwireless/reusable-helm-chart/commit/d84b2408771f559a823c597be6d54d3aea5d0e55))
+
+
+### Features
+
+* Add optional name field for NATS JetStream Streams and Consumers ([3bef538](https://github.com/chirpwireless/reusable-helm-chart/commit/3bef538cfbf443ee1cf25aaa336280dd9bdca8ce))
+
 # [1.13.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.12.1...v1.13.0) (2026-02-27)
 
 
