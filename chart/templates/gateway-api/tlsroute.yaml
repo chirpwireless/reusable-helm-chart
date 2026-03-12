@@ -1,0 +1,32 @@
+{{- range .Values.tlsRoutes }}
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: {{ include "reusable-helm-chart.fullname" $ }}{{ if .nameSuffix }}-{{ .nameSuffix }}{{ end }}
+  labels:
+    {{- include "reusable-helm-chart.labels" $ | nindent 4 }}
+  {{- with .annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  parentRefs:
+    {{- range .parentRefs }}
+    - name: {{ .name }}
+      namespace: {{ .namespace }}
+      {{- with .sectionName }}
+      sectionName: {{ . }}
+      {{- end }}
+    {{- end }}
+  hostnames:
+    {{- range .hostnames }}
+    - {{ . | quote }}
+    {{- end }}
+  rules:
+    {{- range .rules }}
+    - backendRefs:
+        - name: {{ .serviceName | default (include "reusable-helm-chart.fullname" $) }}
+          port: {{ .servicePort }}
+    {{- end }}
+---
+{{- end }}

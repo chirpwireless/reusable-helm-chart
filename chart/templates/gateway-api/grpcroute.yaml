@@ -1,6 +1,6 @@
-{{- range .Values.httpRoutes }}
+{{- range .Values.grpcRoutes }}
 apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
+kind: GRPCRoute
 metadata:
   name: {{ include "reusable-helm-chart.fullname" $ }}{{ if .nameSuffix }}-{{ .nameSuffix }}{{ end }}
   labels:
@@ -24,15 +24,21 @@ spec:
     {{- end }}
   rules:
     {{- range .rules }}
-    - matches:
-        {{- range .matches }}
-        - path:
-            type: {{ .pathType | default "PathPrefix" }}
-            value: {{ .path }}
-        {{- end }}
-      backendRefs:
-        - name: {{ include "reusable-helm-chart.fullname" $ }}
+    - backendRefs:
+        - name: {{ .serviceName | default (include "reusable-helm-chart.fullname" $) }}
           port: {{ .servicePort }}
+      {{- with .matches }}
+      matches:
+        {{- range . }}
+        - method:
+            {{- with .service }}
+            service: {{ . }}
+            {{- end }}
+            {{- with .method }}
+            method: {{ . }}
+            {{- end }}
+        {{- end }}
+      {{- end }}
     {{- end }}
 ---
 {{- end }}

@@ -525,29 +525,50 @@ ingress: []
 #     parentRefs:
 #       - name: internal
 #         namespace: envoy-gateway-system
-#         sectionName: https
+#         sectionName: https-dev-chirpwireless-io
 #     hostnames:
-#       - my-app.gw.dev.chirpwireless.io
+#       - my-app.dev.chirpwireless.io
 #     rules:
 #       - matches:
 #           - path: /
 #             pathType: PathPrefix
 #         servicePort: 8080
-#     # Optional: local rate limiting (creates BackendTrafficPolicy)
-#     # Note: Local rate limiting is per-Envoy-instance. Global rate limiting
-#     # requires a dedicated rate limit service (e.g. Redis) and is not supported here.
+#         # Optional: override backend service name (defaults to chart fullname)
+#         # serviceName: my-other-service
+#     # Optional: request timeout
+#     timeout: "3600s"
+#     # Optional: max request body size
+#     requestBuffer: "5Mi"
+#     # Optional: sticky sessions via cookie
+#     loadBalancer:
+#       consistentHash:
+#         cookie:
+#           name: session
+#           ttl: 24h
+#         type: Cookie
+#       type: ConsistentHash
+#     # Optional: local rate limiting
 #     rateLimit:
 #       rules:
 #         - requests: 100
 #           unit: Minute
-#         - requests: 10
-#           unit: Second
-#           clientSelectors:
-#             - headers:
-#                 - name: x-api-key
-#                   type: Distinct
-#     # Optional: auth (creates SecurityPolicy)
-#     # JWT validation:
+#     # Optional: CORS
+#     cors:
+#       allowOrigins:
+#         - "*"
+#       allowMethods:
+#         - GET
+#         - POST
+#         - PUT
+#         - PATCH
+#         - DELETE
+#         - OPTIONS
+#       allowHeaders:
+#         - "*"
+#       exposeHeaders:
+#         - "*"
+#       maxAge: 24h
+#     # Optional: JWT validation
 #     auth:
 #       jwt:
 #         providers:
@@ -558,18 +579,58 @@ ingress: []
 #               - header: x-user-id
 #                 claim: sub
 #     # OR OIDC (redirect to login page):
-#     # auth:
-#     #   oidc:
-#     #     issuer: https://your-zitadel.zitadel.cloud
-#     #     clientID: your-client-id
-#     #     clientSecretName: zitadel-oidc-secret
-#     #     redirectURL: https://my-app.gw.dev.chirpwireless.io/oauth2/callback
-#     #     scopes:
-#     #       - openid
-#     #       - profile
-#     #       - email
+#     auth:
+#       oidc:
+#         issuer: https://your-zitadel.zitadel.cloud
+#         clientID: your-client-id
+#         clientSecretName: zitadel-oidc-secret
+#         redirectURL: https://my-app.dev.chirpwireless.io/oauth2/callback
+#         scopes:
+#           - openid
+#           - profile
+#           - email
 #
 httpRoutes: []
+
+# @param grpcRoutes List of GRPCRoute objects for the application (Gateway API)
+# Example:
+# grpcRoutes:
+#   - nameSuffix: "grpc"
+#     parentRefs:
+#       - name: internal
+#         namespace: envoy-gateway-system
+#         sectionName: https-dev-chirpwireless-io
+#     hostnames:
+#       - my-app.dev.chirpwireless.io
+#     rules:
+#       - servicePort: 8090
+#         matches:
+#           - service: my.package.MyService
+#           - service: my.package.AnotherService
+#             method: GetItem
+#     # Optional: timeout for gRPC backend
+#     timeout: "3600s"
+#     # Optional: CORS
+#     cors:
+#       allowOrigins:
+#         - "*"
+#       maxAge: 24h
+#
+grpcRoutes: []
+
+# @param tlsRoutes List of TLSRoute objects for the application (Gateway API, SSL passthrough)
+# Example:
+# tlsRoutes:
+#   - nameSuffix: "passthrough"
+#     parentRefs:
+#       - name: passthrough
+#         namespace: envoy-gateway-system
+#     hostnames:
+#       - my-app.dev.chirpwireless.io
+#     rules:
+#       - servicePort: 3001
+#
+tlsRoutes: []
 
 # @param persistence Persistence configuration for the chart
 # Example:

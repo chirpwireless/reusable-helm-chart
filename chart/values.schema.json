@@ -1711,9 +1711,98 @@
                   "description": "Backend service port",
                   "required": [],
                   "examples": [{ "servicePort": 8080 }]
+                },
+                "serviceName": {
+                  "type": "string",
+                  "description": "Override backend service name (defaults to chart fullname)",
+                  "examples": [{ "serviceName": "my-other-service" }]
                 }
               }
             }
+          },
+          "timeout": {
+            "type": "string",
+            "description": "Request timeout duration (creates BackendTrafficPolicy). Example: 3600s",
+            "examples": [{ "timeout": "3600s" }]
+          },
+          "requestBuffer": {
+            "type": "string",
+            "description": "Max request body size (creates BackendTrafficPolicy). Example: 5Mi, 10Mi",
+            "examples": [{ "requestBuffer": "5Mi" }]
+          },
+          "loadBalancer": {
+            "type": "object",
+            "description": "Load balancer configuration, e.g. consistent hash with cookie (creates BackendTrafficPolicy)",
+            "properties": {
+              "consistentHash": {
+                "type": "object",
+                "properties": {
+                  "cookie": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Cookie name for session affinity"
+                      },
+                      "ttl": {
+                        "type": "string",
+                        "description": "Cookie TTL, e.g. 24h"
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Hash type, e.g. Cookie"
+                  }
+                }
+              },
+              "type": {
+                "type": "string",
+                "description": "Load balancer type, e.g. ConsistentHash"
+              }
+            },
+            "examples": [
+              {
+                "loadBalancer": {
+                  "consistentHash": {
+                    "cookie": { "name": "session", "ttl": "24h" },
+                    "type": "Cookie"
+                  },
+                  "type": "ConsistentHash"
+                }
+              }
+            ]
+          },
+          "cors": {
+            "type": "object",
+            "description": "CORS configuration (creates SecurityPolicy). Defaults: allowOrigins=[*], allowMethods=[GET,POST,PUT,PATCH,DELETE,OPTIONS]",
+            "properties": {
+              "allowOrigins": {
+                "type": "array",
+                "description": "Allowed origins. Defaults to [\"*\"]",
+                "items": { "type": "string" }
+              },
+              "allowMethods": {
+                "type": "array",
+                "description": "Allowed HTTP methods. Defaults to [GET,POST,PUT,PATCH,DELETE,OPTIONS]",
+                "items": { "type": "string" }
+              },
+              "allowHeaders": {
+                "type": "array",
+                "description": "Allowed request headers",
+                "items": { "type": "string" }
+              },
+              "exposeHeaders": {
+                "type": "array",
+                "description": "Headers to expose to the browser",
+                "items": { "type": "string" }
+              },
+              "maxAge": {
+                "type": "string",
+                "description": "Max age for preflight cache, e.g. 24h"
+              }
+            },
+            "examples": [{ "cors": { "allowOrigins": ["*"], "maxAge": "24h" } }]
           },
           "rateLimit": {
             "type": "object",
@@ -1923,6 +2012,245 @@
                   "servicePort": 8080
                 }
               ]
+            }
+          ]
+        }
+      ]
+    },
+    "grpcRoutes": {
+      "type": "array",
+      "description": "List of GRPCRoute objects for the application (Gateway API)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nameSuffix": {
+            "type": "string",
+            "description": "Suffix to append to the GRPCRoute name for uniqueness",
+            "examples": [{ "nameSuffix": "grpc" }]
+          },
+          "parentRefs": {
+            "type": "array",
+            "description": "Parent references for the GRPCRoute (Gateway references)",
+            "items": {
+              "type": "object",
+              "required": ["name", "namespace"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name of the parent Gateway"
+                },
+                "namespace": {
+                  "type": "string",
+                  "description": "Namespace of the parent Gateway"
+                },
+                "sectionName": {
+                  "type": "string",
+                  "description": "Section name of the parent Gateway listener"
+                }
+              }
+            }
+          },
+          "hostnames": {
+            "type": "array",
+            "description": "Hostnames for the GRPCRoute",
+            "items": { "type": "string" }
+          },
+          "annotations": {
+            "type": "object",
+            "description": "Kubernetes annotations for the GRPCRoute"
+          },
+          "rules": {
+            "type": "array",
+            "description": "Routing rules for the GRPCRoute",
+            "items": {
+              "type": "object",
+              "properties": {
+                "servicePort": {
+                  "type": "integer",
+                  "description": "Backend service port"
+                },
+                "serviceName": {
+                  "type": "string",
+                  "description": "Override backend service name (defaults to chart fullname)"
+                },
+                "matches": {
+                  "type": "array",
+                  "description": "gRPC method matches",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "service": {
+                        "type": "string",
+                        "description": "gRPC service name, e.g. my.package.MyService"
+                      },
+                      "method": {
+                        "type": "string",
+                        "description": "gRPC method name, e.g. GetItem"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "timeout": {
+            "type": "string",
+            "description": "Request timeout duration (creates BackendTrafficPolicy)"
+          },
+          "requestBuffer": {
+            "type": "string",
+            "description": "Max request body size (creates BackendTrafficPolicy)"
+          },
+          "loadBalancer": {
+            "type": "object",
+            "description": "Load balancer configuration (creates BackendTrafficPolicy)"
+          },
+          "cors": {
+            "type": "object",
+            "description": "CORS configuration (creates SecurityPolicy)",
+            "properties": {
+              "allowOrigins": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "allowMethods": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "allowHeaders": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "exposeHeaders": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "maxAge": { "type": "string" }
+            }
+          },
+          "auth": {
+            "type": "object",
+            "description": "Authentication configuration (creates SecurityPolicy)",
+            "properties": {
+              "jwt": {
+                "type": "object",
+                "properties": {
+                  "providers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": { "type": "string" },
+                        "issuer": { "type": "string" },
+                        "jwksUri": { "type": "string" },
+                        "claimToHeaders": {
+                          "type": "array",
+                          "items": { "type": "object" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "examples": [
+        {
+          "grpcRoutes": [
+            {
+              "nameSuffix": "grpc",
+              "parentRefs": [
+                {
+                  "name": "internal",
+                  "namespace": "envoy-gateway-system",
+                  "sectionName": "https-dev-chirpwireless-io"
+                }
+              ],
+              "hostnames": ["my-app.dev.chirpwireless.io"],
+              "rules": [
+                {
+                  "servicePort": 8090,
+                  "matches": [{ "service": "my.package.MyService" }]
+                }
+              ],
+              "timeout": "3600s"
+            }
+          ]
+        }
+      ]
+    },
+    "tlsRoutes": {
+      "type": "array",
+      "description": "List of TLSRoute objects for the application (Gateway API, SSL passthrough)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nameSuffix": {
+            "type": "string",
+            "description": "Suffix to append to the TLSRoute name for uniqueness"
+          },
+          "parentRefs": {
+            "type": "array",
+            "description": "Parent references for the TLSRoute (Gateway references)",
+            "items": {
+              "type": "object",
+              "required": ["name", "namespace"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name of the parent Gateway"
+                },
+                "namespace": {
+                  "type": "string",
+                  "description": "Namespace of the parent Gateway"
+                },
+                "sectionName": {
+                  "type": "string",
+                  "description": "Section name of the parent Gateway listener"
+                }
+              }
+            }
+          },
+          "hostnames": {
+            "type": "array",
+            "description": "Hostnames for the TLSRoute",
+            "items": { "type": "string" }
+          },
+          "annotations": {
+            "type": "object",
+            "description": "Kubernetes annotations for the TLSRoute"
+          },
+          "rules": {
+            "type": "array",
+            "description": "Routing rules for the TLSRoute",
+            "items": {
+              "type": "object",
+              "properties": {
+                "servicePort": {
+                  "type": "integer",
+                  "description": "Backend service port"
+                },
+                "serviceName": {
+                  "type": "string",
+                  "description": "Override backend service name (defaults to chart fullname)"
+                }
+              }
+            }
+          }
+        }
+      },
+      "examples": [
+        {
+          "tlsRoutes": [
+            {
+              "nameSuffix": "passthrough",
+              "parentRefs": [
+                { "name": "passthrough", "namespace": "envoy-gateway-system" }
+              ],
+              "hostnames": ["my-app.dev.chirpwireless.io"],
+              "rules": [{ "servicePort": 3001 }]
             }
           ]
         }
@@ -3076,6 +3404,8 @@
       },
       "cronjob": [],
       "httpRoutes": [],
+      "grpcRoutes": [],
+      "tlsRoutes": [],
       "ingress": [],
       "persistence": {
         "enabled": true,
