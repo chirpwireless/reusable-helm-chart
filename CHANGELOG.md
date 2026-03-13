@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.14.0...v1.15.0) (2026-03-13)
+
+
+### Features
+
+* Reorganize Gateway API templates and add GRPCRoute, TLSRoute, CORS, and traffic management support ([f03ff72](https://github.com/chirpwireless/reusable-helm-chart/commit/f03ff72ff660bdd160de999eaf57966696ba2170))
+
 # [1.14.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.13.0...v1.14.0) (2026-03-04)
 
 
