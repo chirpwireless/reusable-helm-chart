@@ -1,3 +1,10 @@
+## [1.15.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.15.0...v1.15.1) (2026-03-20)
+
+
+### Bug Fixes
+
+* Add OIDC authentication, gRPC method type configuration, and rate limiting for gRPC routes ([5603ff2](https://github.com/chirpwireless/reusable-helm-chart/commit/5603ff293c26a545ae713399c54f04709e4102b0))
+
 # [1.15.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.14.0...v1.15.0) (2026-03-13)
 
 
