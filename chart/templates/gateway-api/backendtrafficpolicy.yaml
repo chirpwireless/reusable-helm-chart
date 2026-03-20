@@ -16,6 +16,7 @@ spec:
     http:
       requestTimeout: {{ . }}
   {{- end }}
+  # Buffering is generally not compatible with upgrades (Websockets, etc.)
   {{- with .requestBuffer }}
   requestBuffer:
     limit: {{ . }}
@@ -43,7 +44,7 @@ spec:
 {{- end }}
 {{- end }}
 {{- range .Values.grpcRoutes }}
-{{- if or .timeout .requestBuffer .loadBalancer }}
+{{- if or .rateLimit .timeout .requestBuffer .loadBalancer }}
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: BackendTrafficPolicy
 metadata:
@@ -60,6 +61,7 @@ spec:
     http:
       requestTimeout: {{ . }}
   {{- end }}
+  # Buffering is generally not compatible with upgrades (Websockets, etc.)
   {{- with .requestBuffer }}
   requestBuffer:
     limit: {{ . }}
@@ -67,6 +69,21 @@ spec:
   {{- with .loadBalancer }}
   loadBalancer:
     {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .rateLimit }}
+  rateLimit:
+    type: Local
+    local:
+      rules:
+        {{- range .rules }}
+        - limit:
+            requests: {{ .requests }}
+            unit: {{ .unit }}
+          {{- with .clientSelectors }}
+          clientSelectors:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- end }}
   {{- end }}
 ---
 {{- end }}

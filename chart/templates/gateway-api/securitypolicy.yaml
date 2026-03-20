@@ -123,6 +123,19 @@ spec:
         {{- end }}
       {{- end }}
   {{- end }}
+  {{- with .oidc }}
+  oidc:
+    provider:
+      issuer: {{ .issuer }}
+    clientID: {{ .clientID }}
+    clientSecret:
+      name: {{ .clientSecretName }}
+    redirectURL: {{ .redirectURL }}
+    {{- with .scopes }}
+    scopes:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
   {{- end }}
 ---
 {{- end }}

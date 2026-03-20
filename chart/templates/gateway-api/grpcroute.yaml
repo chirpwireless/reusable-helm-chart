@@ -31,6 +31,7 @@ spec:
       matches:
         {{- range . }}
         - method:
+            type: {{ .type | default "Exact" }}
             {{- with .service }}
             service: {{ . }}
             {{- end }}
