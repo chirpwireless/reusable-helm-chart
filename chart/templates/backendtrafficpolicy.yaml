@@ -27,3 +27,32 @@ spec:
 ---
 {{- end }}
 {{- end }}
+{{- range .Values.grpcRoutes }}
+{{- if .rateLimit }}
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: {{ include "reusable-helm-chart.fullname" $ }}{{ if .nameSuffix }}-{{ .nameSuffix }}{{ end }}
+  labels:
+    {{- include "reusable-helm-chart.labels" $ | nindent 4 }}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: GRPCRoute
+      name: {{ include "reusable-helm-chart.fullname" $ }}{{ if .nameSuffix }}-{{ .nameSuffix }}{{ end }}
+  rateLimit:
+    type: Local
+    local:
+      rules:
+        {{- range .rateLimit.rules }}
+        - limit:
+            requests: {{ .requests }}
+            unit: {{ .unit }}
+          {{- with .clientSelectors }}
+          clientSelectors:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- end }}
+---
+{{- end }}
+{{- end }}

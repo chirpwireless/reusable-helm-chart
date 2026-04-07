@@ -571,6 +571,36 @@ ingress: []
 #
 httpRoutes: []
 
+# @param grpcRoutes List of GRPCRoute objects for the application (Gateway API)
+# Example:
+# grpcRoutes:
+#   - nameSuffix: "grpc"
+#     parentRefs:
+#       - name: public-api
+#         namespace: envoy-gateway-system
+#         sectionName: https-dev-chirpwireless-io
+#     hostnames:
+#       - api.dev.chirpwireless.io
+#     rules:
+#       - matches:
+#           - service: mypackage.MyService
+#             method: MyMethod
+#         servicePort: 50051
+#     # Optional: local rate limiting (creates BackendTrafficPolicy)
+#     rateLimit:
+#       rules:
+#         - requests: 100
+#           unit: Minute
+#     # Optional: auth (creates SecurityPolicy with JWT/OIDC)
+#     auth:
+#       jwt:
+#         providers:
+#           - name: zitadel
+#             issuer: https://your-zitadel.zitadel.cloud
+#             jwksUri: https://your-zitadel.zitadel.cloud/oauth/v2/keys
+#
+grpcRoutes: []
+
 # @param persistence Persistence configuration for the chart
 # Example:
 # persistence:
