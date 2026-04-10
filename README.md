@@ -1,155 +1,121 @@
 # Reusable Helm Chart
 
-A flexible and reusable Helm chart for deploying applications on Kubernetes.
+Universal Helm chart for deploying applications on Kubernetes.
 
 ## Features
 
-- Configurable deployment options for various application types
-- Support for HTTP and gRPC health probes
-- Flexible port configuration (supports both integer and string values)
-- Configurable resource limits and requests
-- Support for environment variables, secrets, and config maps
-- Ingress configuration with TLS support
-- Service configuration with multiple port options
-- NATS JetStream Stream and Consumer management
+**Workloads**: Deployment, StatefulSet, CronJob
+
+**Networking**:
+
+- Service (ClusterIP, NodePort, LoadBalancer)
+- Ingress (nginx) with TLS
+- Gateway API (Envoy): HTTPRoute, GRPCRoute, TLSRoute
+
+**Security**:
+
+- JWT/OIDC authentication via SecurityPolicy
+- CORS configuration
+- Rate limiting (local)
+- RBAC (Role/ClusterRole)
+
+**Configuration**:
+
+- ExternalSecrets (Vault integration)
+- ConfigMaps, Secrets, file mounts
+- Environment variables
+
+**Database & Messaging**:
+
+- DB migrations (Liquibase)
+- MongoDB Operator CRD
+- NATS JetStream Streams/Consumers
+
+**Observability**:
+
+- Prometheus metrics + ServiceMonitor
+- HTTP/gRPC health probes
+
+**Scaling**:
+
+- HPA with configurable policies
+- Pod anti-affinity (zone/node distribution)
+- PVC persistence
 
 ## Installation
-
-### Prerequisites
-
-- Kubernetes 1.16+
-- Helm 3.7+
-
-### Adding the Helm Repository
 
 ```bash
 helm repo add chirpwireless https://chirpwireless.github.io/reusable-helm-chart
 helm repo update
-```
-
-### Installing the Chart
-
-```bash
-helm install my-release chirpwireless/reusable-helm-chart
-```
-
-To install the chart with custom values:
-
-```bash
 helm install my-release chirpwireless/reusable-helm-chart -f values.yaml
 ```
 
+**Requirements**: Kubernetes 1.16+, Helm 3.7+
+
 ## Configuration
 
-The following table lists the configurable parameters of the chart and their default values.
+See [chart/values.yaml](./chart/values.yaml) for all parameters with examples.
 
-| Parameter              | Description              | Default        |
-| ---------------------- | ------------------------ | -------------- |
-| `image.repository`     | Image repository         | `nginx`        |
-| `image.tag`            | Image tag                | `latest`       |
-| `image.pullPolicy`     | Image pull policy        | `IfNotPresent` |
-| `service.type`         | Service type             | `ClusterIP`    |
-| `service.port`         | Service port             | `80`           |
-| `ingress.enabled`      | Enable ingress           | `false`        |
-| `resources.limits`     | Pod resource limits      | `{}`           |
-| `resources.requests`   | Pod resource requests    | `{}`           |
-| `natsStreams`          | NATS JetStream Streams   | `{}`           |
-| `natsStreamsConsumers` | NATS JetStream Consumers | `{}`           |
+Key parameters:
 
-For a complete list of parameters, see the [values.yaml](./values.yaml) file.
+| Parameter             | Description                                          | Default                                      |
+| --------------------- | ---------------------------------------------------- | -------------------------------------------- |
+| `deployment.enabled`  | Use Deployment (mutually exclusive with statefulset) | `true`                                       |
+| `statefulset.enabled` | Use StatefulSet                                      | `false`                                      |
+| `image.repository`    | Container image                                      | `gcr.io/google_containers/echoserver`        |
+| `service.ports`       | Service port mappings                                | `[{port: 80, targetPort: 8080, name: http}]` |
+| `ingress`             | Ingress configurations (list)                        | `[]`                                         |
+| `httpRoutes`          | Gateway API HTTPRoutes (list)                        | `[]`                                         |
+| `externalSecrets`     | Vault secrets mapping                                | `{}`                                         |
+| `autoscaling.enabled` | Enable HPA                                           | `false`                                      |
 
-## NATS JetStream
+## Examples
 
-The chart supports creating NATS JetStream Stream and Consumer resources via the [NATS JetStream Controller](https://github.com/nats-io/nack) CRDs (`jetstream.nats.io/v1beta2`).
+### Gateway API with JWT Auth
 
-### Streams
+```yaml
+httpRoutes:
+  - nameSuffix: api
+    parentRefs:
+      - name: internal
+        namespace: envoy-gateway-system
+    hostnames:
+      - my-app.dev.chirpwireless.io
+    rules:
+      - matches:
+          - path: /
+            pathType: PathPrefix
+        servicePort: 8080
+    auth:
+      jwt:
+        providers:
+          - name: zitadel
+            issuer: https://your-zitadel.zitadel.cloud
+            jwksUri: https://your-zitadel.zitadel.cloud/oauth/v2/keys
+```
 
-Define streams your application needs to publish to or consume from:
+### NATS JetStream
 
 ```yaml
 natsStreams:
   my-events:
-    description: "Application event stream"
-    subjects:
-      - "events.>"
+    subjects: ["events.>"]
     storage: file
-    retention: limits
     replicas: 3
-    maxAge: 72h
-```
 
-### Consumers
-
-Define durable consumers that subscribe to streams:
-
-```yaml
 natsStreamsConsumers:
   my-consumer:
     streamName: my-events
-    description: "Process created events"
-    deliverPolicy: all
-    ackPolicy: explicit
-    ackWait: 30s
-    maxAckPending: 1000
-    maxDeliver: 5
     filterSubject: "events.created"
-    replayPolicy: instant
-```
-
-All fields except the map key and `subjects` (Stream) / `streamName` (Consumer) are optional.
-
-## Health Probes
-
-The chart supports both HTTP and gRPC health probes:
-
-### HTTP Probes
-
-```yaml
-livenessProbe:
-  httpGet:
-    path: /health
-    port: http
-    scheme: HTTP
-```
-
-### gRPC Probes
-
-```yaml
-livenessProbe:
-  grpc:
-    port: 8080
-    service: my.service.name
+    ackPolicy: explicit
 ```
 
 ## Contributing
 
-### Commit Message Format
+Uses [Conventional Commits](https://www.conventionalcommits.org/) for semantic versioning:
 
-This repository follows [Conventional Commits](https://www.conventionalcommits.org/) for automatic versioning:
+- `feat:` → minor bump
+- `fix:` → patch bump
+- `BREAKING CHANGE:` → major bump
 
-- `feat:` - New features (minor version bump)
-- `fix:` - Bug fixes (patch version bump)
-- `docs:` - Documentation changes (no version bump)
-- `style:` - Code style changes (no version bump)
-- `refactor:` - Code refactoring (no version bump)
-- `perf:` - Performance improvements (patch version bump)
-- `test:` - Adding tests (no version bump)
-- `chore:` - Maintenance tasks (no version bump)
-- `BREAKING CHANGE:` - Breaking changes (major version bump)
-
-Example:
-
-```
-feat: add support for gRPC probes
-```
-
-### Development Workflow
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Release workflow: merge to `release` branch → semantic-release → GitHub Pages
