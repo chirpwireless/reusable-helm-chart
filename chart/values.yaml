@@ -69,6 +69,8 @@ global:
 #       secretStoreName: vault-backend
 #       # Path to vault secret
 #       secretPath: path/to/secret
+#       # How often the secret is refreshed (default: 1h)
+#       refreshInterval: 1h
 #       properties:
 #         # Mapping vault_property: secret_property
 #         property1: secret_property1
@@ -378,6 +380,8 @@ sidecars: []
 #     secretStoreName: vault-backend
 #     # Path to vault secret
 #     secretPath: path/to/secret
+#     # How often the secret is refreshed (default: 1h)
+#     refreshInterval: 1h
 #     properties:
 #       # Mapping vault_property: secret_property
 #       property1: secret_property1

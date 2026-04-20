@@ -346,6 +346,7 @@
                 "name-of-the-secret": {
                   "secretStoreName": "vault-backend",
                   "secretPath": "path/to/secret",
+                  "refreshInterval": "1h",
                   "properties": {
                     "property1": "secret_property1",
                     "property2": "secret_property2"
