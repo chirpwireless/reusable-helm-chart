@@ -1,3 +1,11 @@
+# [1.16.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.15.1...v1.16.0) (2026-04-20)
+
+
+### Features
+
+* Rename AGNETS.md to CLAUDE.md ([f88072f](https://github.com/chirpwireless/reusable-helm-chart/commit/f88072f5316f99f22cd543328f8e66d647e45df7))
+* Set default ttl for external-secrets 1 hour ([c7a6c76](https://github.com/chirpwireless/reusable-helm-chart/commit/c7a6c76351bb52b7ba5acdf53fc2e59bf9f8dd91))
+
 ## [1.15.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.15.0...v1.15.1) (2026-03-20)
 
 
