@@ -22,6 +22,10 @@ spec:
   {{- with $value.ackWait }}
   ackWait: {{ . }}
   {{- end }}
+  {{- with $value.backOff }}
+  backOff:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   {{- with $value.maxAckPending }}
   maxAckPending: {{ . }}
   {{- end }}
