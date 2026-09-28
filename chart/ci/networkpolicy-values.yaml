@@ -1,0 +1,27 @@
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: allowed-client
+      ports:
+        - port: 8080
+          protocol: TCP
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: allowed-namespace
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: allowed-client-in-namespace
+      ports:
+        - port: 9090
+          protocol: TCP
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: allowed-metrics-client
+      ports:
+        - port: metrics
+          protocol: TCP
