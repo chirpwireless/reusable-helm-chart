@@ -110,6 +110,29 @@ natsStreamsConsumers:
     ackPolicy: explicit
 ```
 
+## NetworkPolicy
+
+Disabled by default, so existing consumers of the chart are unaffected. When enabled, the chart
+renders a `NetworkPolicy` scoped to the release's own pods (`podSelector` matches the chart's
+selector labels), restricting only ingress — egress is never limited by this chart.
+
+```yaml
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: my-client
+      ports:
+        - port: 8080
+          protocol: TCP
+```
+
+`ingress` is a list of rules; each rule's `from` and `ports` follow the standard Kubernetes
+`NetworkPolicyPeer` / `NetworkPolicyPort` shapes. `enabled: true` with an empty (or omitted)
+`ingress` list denies all inbound traffic to the release's pods.
+
 ## Contributing
 
 Uses [Conventional Commits](https://www.conventionalcommits.org/) for semantic versioning:

@@ -832,3 +832,22 @@ nodeSelector: {}
 # tolerations: []
 #
 tolerations: []
+
+# @param networkPolicy NetworkPolicy configuration for the application
+# Example:
+# networkPolicy:
+#   enabled: true
+#   ingress:
+#     - from:
+#         - podSelector:
+#             matchLabels:
+#               app.kubernetes.io/name: my-client
+#       ports:
+#         - port: 8080
+#           protocol: TCP
+# Note: enabled: true with an empty ingress list denies all inbound traffic.
+# Egress is never restricted by this chart.
+#
+networkPolicy:
+  enabled: false
+  ingress: []

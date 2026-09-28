@@ -3300,6 +3300,94 @@
       "required": [],
       "items": {},
       "examples": [{}]
+    },
+    "networkPolicy": {
+      "type": "object",
+      "description": "NetworkPolicy configuration for the application",
+      "required": [],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable NetworkPolicy for the application. An empty ingress list with enabled: true denies all inbound traffic; egress is never restricted",
+          "required": [],
+          "examples": [{ "enabled": true }]
+        },
+        "ingress": {
+          "type": "array",
+          "description": "List of NetworkPolicy ingress rules",
+          "required": [],
+          "items": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "from": {
+                "type": "array",
+                "description": "List of NetworkPolicyPeer sources allowed by this rule (podSelector, namespaceSelector, ipBlock)",
+                "required": [],
+                "items": { "type": "object", "properties": {} }
+              },
+              "ports": {
+                "type": "array",
+                "description": "List of allowed ports for this rule",
+                "required": [],
+                "items": {
+                  "type": "object",
+                  "required": [],
+                  "properties": {
+                    "port": {
+                      "oneOf": [{ "type": "integer" }, { "type": "string" }],
+                      "description": "Port number or named port",
+                      "required": []
+                    },
+                    "protocol": {
+                      "type": "string",
+                      "default": "TCP",
+                      "description": "Protocol for the port",
+                      "required": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "examples": [
+            {
+              "ingress": [
+                {
+                  "from": [
+                    {
+                      "podSelector": {
+                        "matchLabels": { "app.kubernetes.io/name": "my-client" }
+                      }
+                    }
+                  ],
+                  "ports": [{ "port": 8080, "protocol": "TCP" }]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "examples": [
+        {
+          "networkPolicy": {
+            "enabled": true,
+            "ingress": [
+              {
+                "from": [
+                  {
+                    "podSelector": {
+                      "matchLabels": { "app.kubernetes.io/name": "my-client" }
+                    }
+                  }
+                ],
+                "ports": [{ "port": 8080, "protocol": "TCP" }]
+              }
+            ]
+          }
+        }
+      ]
     }
   },
   "examples": [
@@ -3478,7 +3566,8 @@
       "natsStreams": {},
       "natsStreamsConsumers": {},
       "nodeSelector": {},
-      "tolerations": []
+      "tolerations": [],
+      "networkPolicy": { "enabled": false, "ingress": [] }
     }
   ],
   "$defs": {
