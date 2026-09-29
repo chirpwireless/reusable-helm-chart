@@ -28,8 +28,9 @@ full=$(rendered networkpolicy-values.yaml)
 policy_types=$(awk '/^  policyTypes:/ {f=1; next} f && /^    - / {print $2; next} f {exit}' <<<"$full")
 [ "$policy_types" = "Ingress" ] || fail "policyTypes must be exactly [Ingress], got: $policy_types"
 
-rules=$(awk '/^  ingress:/ {f=1; next} f && /^    - from:/ {n++} END {print n+0}' <<<"$full")
-[ "$rules" -eq 3 ] || fail "expected 3 ingress rules from the fixture, got $rules"
+rendered_ingress=$(yq -o=json -I=0 '.spec.ingress' <<<"$full")
+fixture_ingress=$(yq -o=json -I=0 '.networkPolicy.ingress' "$chart/ci/networkpolicy-values.yaml")
+[ "$rendered_ingress" = "$fixture_ingress" ] || fail "rendered ingress differs from the fixture: $rendered_ingress"
 
 policy_selector=$(selector_labels podSelector <<<"$full")
 deployment_selector=$(helm template "$chart" --show-only templates/deployment.yaml | selector_labels selector)

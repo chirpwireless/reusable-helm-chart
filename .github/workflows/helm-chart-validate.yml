@@ -3,6 +3,7 @@ name: Helm Chart Validation
 on:
   push:
     paths:
+      - ".github/scripts/**"
       - "**/*.yaml"
       - "**/*.yml"
       - "**/*.json"
@@ -11,6 +12,7 @@ on:
       - "templates/**"
   pull_request:
     paths:
+      - ".github/scripts/**"
       - "**/*.yaml"
       - "**/*.yml"
       - "**/*.json"

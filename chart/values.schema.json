@@ -3311,7 +3311,11 @@
           "default": false,
           "description": "Enable NetworkPolicy for the application. An empty ingress list with enabled: true denies all inbound traffic; egress is never restricted",
           "required": [],
-          "examples": [{ "enabled": true }]
+          "examples": [
+            {
+              "enabled": true
+            }
+          ]
         },
         "ingress": {
           "type": "array",
@@ -3319,22 +3323,127 @@
           "required": [],
           "items": {
             "type": "object",
-            "required": [],
+            "required": [
+              "from"
+            ],
             "additionalProperties": false,
             "properties": {
               "from": {
                 "type": "array",
-                "description": "List of NetworkPolicyPeer sources allowed by this rule (podSelector, namespaceSelector, ipBlock)",
+                "description": "List of NetworkPolicyPeer sources allowed by this rule (podSelector, namespaceSelector, ipBlock); at least one peer is required — an empty or missing list would allow every source",
                 "required": [],
                 "items": {
                   "type": "object",
                   "additionalProperties": false,
                   "properties": {
-                    "podSelector": { "type": "object" },
-                    "namespaceSelector": { "type": "object" },
-                    "ipBlock": { "type": "object" }
-                  }
-                }
+                    "podSelector": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "matchLabels": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        },
+                        "matchExpressions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "key",
+                              "operator"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "operator": {
+                                "type": "string",
+                                "enum": [
+                                  "In",
+                                  "NotIn",
+                                  "Exists",
+                                  "DoesNotExist"
+                                ]
+                              },
+                              "values": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "namespaceSelector": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "matchLabels": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        },
+                        "matchExpressions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "key",
+                              "operator"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "operator": {
+                                "type": "string",
+                                "enum": [
+                                  "In",
+                                  "NotIn",
+                                  "Exists",
+                                  "DoesNotExist"
+                                ]
+                              },
+                              "values": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "ipBlock": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "cidr"
+                      ],
+                      "properties": {
+                        "cidr": {
+                          "type": "string"
+                        },
+                        "except": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "minProperties": 1
+                },
+                "minItems": 1
               },
               "ports": {
                 "type": "array",
@@ -3347,7 +3456,11 @@
                   "properties": {
                     "port": {
                       "oneOf": [
-                        { "type": "integer" },
+                        {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        },
                         {
                           "type": "string",
                           "maxLength": 15,
@@ -3360,11 +3473,17 @@
                     "endPort": {
                       "type": "integer",
                       "description": "End of the port range starting at port",
-                      "required": []
+                      "required": [],
+                      "minimum": 1,
+                      "maximum": 65535
                     },
                     "protocol": {
                       "type": "string",
-                      "enum": ["TCP", "UDP", "SCTP"],
+                      "enum": [
+                        "TCP",
+                        "UDP",
+                        "SCTP"
+                      ],
                       "default": "TCP",
                       "description": "Protocol for the port",
                       "required": []
@@ -3381,11 +3500,18 @@
                   "from": [
                     {
                       "podSelector": {
-                        "matchLabels": { "app.kubernetes.io/name": "my-client" }
+                        "matchLabels": {
+                          "app.kubernetes.io/name": "my-client"
+                        }
                       }
                     }
                   ],
-                  "ports": [{ "port": 8080, "protocol": "TCP" }]
+                  "ports": [
+                    {
+                      "port": 8080,
+                      "protocol": "TCP"
+                    }
+                  ]
                 }
               ]
             }
@@ -3401,16 +3527,24 @@
                 "from": [
                   {
                     "podSelector": {
-                      "matchLabels": { "app.kubernetes.io/name": "my-client" }
+                      "matchLabels": {
+                        "app.kubernetes.io/name": "my-client"
+                      }
                     }
                   }
                 ],
-                "ports": [{ "port": 8080, "protocol": "TCP" }]
+                "ports": [
+                  {
+                    "port": 8080,
+                    "protocol": "TCP"
+                  }
+                ]
               }
             ]
           }
         }
-      ]
+      ],
+      "additionalProperties": false
     }
   },
   "examples": [
