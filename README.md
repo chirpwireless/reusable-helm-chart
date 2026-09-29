@@ -133,6 +133,9 @@ networkPolicy:
 `NetworkPolicyPeer` / `NetworkPolicyPort` shapes. `enabled: true` with an empty (or omitted)
 `ingress` list denies all inbound traffic to the release's pods.
 
+`ports[].port` is the container (pod) port, i.e. the Service `targetPort`, not the Service port:
+writing the Service port (80 by default) silently blocks the real traffic.
+
 ## Contributing
 
 Uses [Conventional Commits](https://www.conventionalcommits.org/) for semantic versioning:

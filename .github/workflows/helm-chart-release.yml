@@ -33,17 +33,7 @@ jobs:
         run: helm template chart --debug
 
       - name: Assert NetworkPolicy renders only when enabled
-        run: |
-          default_count=$(helm template chart | grep -c '^kind: NetworkPolicy' || true)
-          if [ "$default_count" -ne 0 ]; then
-            echo "expected 0 NetworkPolicy objects with default values, got $default_count"
-            exit 1
-          fi
-          enabled_count=$(helm template chart -f chart/ci/networkpolicy-values.yaml | grep -c '^kind: NetworkPolicy' || true)
-          if [ "$enabled_count" -ne 1 ]; then
-            echo "expected 1 NetworkPolicy object with networkPolicy.enabled=true, got $enabled_count"
-            exit 1
-          fi
+        run: .github/scripts/assert-networkpolicy.sh chart
 
   release:
     needs: lint-test

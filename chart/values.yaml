@@ -846,6 +846,7 @@ tolerations: []
 #         - port: 8080
 #           protocol: TCP
 # Note: enabled: true with an empty ingress list denies all inbound traffic.
+# ports[].port is the container port (Service targetPort), not the Service port.
 # Egress is never restricted by this chart.
 #
 networkPolicy:

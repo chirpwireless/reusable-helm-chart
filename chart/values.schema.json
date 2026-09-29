@@ -3320,12 +3320,21 @@
           "items": {
             "type": "object",
             "required": [],
+            "additionalProperties": false,
             "properties": {
               "from": {
                 "type": "array",
                 "description": "List of NetworkPolicyPeer sources allowed by this rule (podSelector, namespaceSelector, ipBlock)",
                 "required": [],
-                "items": { "type": "object", "properties": {} }
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "podSelector": { "type": "object" },
+                    "namespaceSelector": { "type": "object" },
+                    "ipBlock": { "type": "object" }
+                  }
+                }
               },
               "ports": {
                 "type": "array",
@@ -3334,14 +3343,28 @@
                 "items": {
                   "type": "object",
                   "required": [],
+                  "additionalProperties": false,
                   "properties": {
                     "port": {
-                      "oneOf": [{ "type": "integer" }, { "type": "string" }],
-                      "description": "Port number or named port",
+                      "oneOf": [
+                        { "type": "integer" },
+                        {
+                          "type": "string",
+                          "maxLength": 15,
+                          "pattern": "^([a-z0-9]+-)*[a-z0-9]*[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+                        }
+                      ],
+                      "description": "Container port number or IANA_SVC_NAME port name (the pod port, not the Service port)",
+                      "required": []
+                    },
+                    "endPort": {
+                      "type": "integer",
+                      "description": "End of the port range starting at port",
                       "required": []
                     },
                     "protocol": {
                       "type": "string",
+                      "enum": ["TCP", "UDP", "SCTP"],
                       "default": "TCP",
                       "description": "Protocol for the port",
                       "required": []
