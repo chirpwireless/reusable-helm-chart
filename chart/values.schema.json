@@ -3344,7 +3344,8 @@
                           "type": "object",
                           "additionalProperties": {
                             "type": "string"
-                          }
+                          },
+                          "minProperties": 1
                         },
                         "matchExpressions": {
                           "type": "array",
@@ -3374,8 +3375,36 @@
                                   "type": "string"
                                 }
                               }
+                            },
+                            "if": {
+                              "properties": {
+                                "operator": {
+                                  "enum": [
+                                    "In",
+                                    "NotIn"
+                                  ]
+                                }
+                              }
+                            },
+                            "then": {
+                              "required": [
+                                "values"
+                              ],
+                              "properties": {
+                                "values": {
+                                  "minItems": 1
+                                }
+                              }
+                            },
+                            "else": {
+                              "properties": {
+                                "values": {
+                                  "maxItems": 0
+                                }
+                              }
                             }
-                          }
+                          },
+                          "minItems": 1
                         }
                       }
                     },
@@ -3387,7 +3416,8 @@
                           "type": "object",
                           "additionalProperties": {
                             "type": "string"
-                          }
+                          },
+                          "minProperties": 1
                         },
                         "matchExpressions": {
                           "type": "array",
@@ -3417,8 +3447,36 @@
                                   "type": "string"
                                 }
                               }
+                            },
+                            "if": {
+                              "properties": {
+                                "operator": {
+                                  "enum": [
+                                    "In",
+                                    "NotIn"
+                                  ]
+                                }
+                              }
+                            },
+                            "then": {
+                              "required": [
+                                "values"
+                              ],
+                              "properties": {
+                                "values": {
+                                  "minItems": 1
+                                }
+                              }
+                            },
+                            "else": {
+                              "properties": {
+                                "values": {
+                                  "maxItems": 0
+                                }
+                              }
                             }
-                          }
+                          },
+                          "minItems": 1
                         }
                       }
                     },
@@ -3430,7 +3488,8 @@
                       ],
                       "properties": {
                         "cidr": {
-                          "type": "string"
+                          "type": "string",
+                          "pattern": "^[0-9A-Fa-f:.]+/[0-9]{1,3}$"
                         },
                         "except": {
                           "type": "array",
@@ -3441,7 +3500,15 @@
                       }
                     }
                   },
-                  "minProperties": 1
+                  "minProperties": 1,
+                  "if": {
+                    "required": [
+                      "ipBlock"
+                    ]
+                  },
+                  "then": {
+                    "maxProperties": 1
+                  }
                 },
                 "minItems": 1
               },
@@ -3451,7 +3518,9 @@
                 "required": [],
                 "items": {
                   "type": "object",
-                  "required": [],
+                  "required": [
+                    "port"
+                  ],
                   "additionalProperties": false,
                   "properties": {
                     "port": {
@@ -3488,8 +3557,21 @@
                       "description": "Protocol for the port",
                       "required": []
                     }
+                  },
+                  "if": {
+                    "required": [
+                      "endPort"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "port": {
+                        "type": "integer"
+                      }
+                    }
                   }
-                }
+                },
+                "minItems": 1
               }
             }
           },

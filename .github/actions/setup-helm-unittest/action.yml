@@ -11,7 +11,7 @@ runs:
       run: |
         set -euo pipefail
         archive="${RUNNER_TEMP}/helm-unittest.tgz"
-        curl -sSfLo "$archive" "https://github.com/helm-unittest/helm-unittest/releases/download/v${VERSION}/helm-unittest-linux-amd64-${VERSION}.tgz"
+        curl -sSfL --retry 3 -o "$archive" "https://github.com/helm-unittest/helm-unittest/releases/download/v${VERSION}/helm-unittest-linux-amd64-${VERSION}.tgz"
         echo "${SHA256}  ${archive}" | sha256sum -c -
         dir="$(helm env HELM_PLUGINS)/helm-unittest"
         mkdir -p "$dir"

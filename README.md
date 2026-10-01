@@ -129,12 +129,28 @@ networkPolicy:
           protocol: TCP
 ```
 
-`ingress` is a list of rules; each rule's `from` and `ports` follow the standard Kubernetes
-`NetworkPolicyPeer` / `NetworkPolicyPort` shapes. `enabled: true` with an empty (or omitted)
-`ingress` list denies all inbound traffic to the release's pods.
+`ingress` is a list of rules; each rule's `from` and `ports` follow the Kubernetes
+`NetworkPolicyPeer` / `NetworkPolicyPort` shapes, with the schema closing the shapes that would open
+a policy by accident:
+
+- every rule names its sources: `from` is required and non-empty, and no source may be empty. "Any
+  source" is written explicitly (`podSelector: {}` — every pod of the namespace, `namespaceSelector: {}`
+  — every namespace, `ipBlock.cidr: 0.0.0.0/0`), never by omission;
+- `matchLabels` / `matchExpressions` may not be empty, `In`/`NotIn` need `values`, `ipBlock` stands alone
+  in its source;
+- `ports`, when present, is non-empty and every entry has a `port`; omit `ports` to allow every port;
+- unknown keys are refused at every level, so a typo fails the render instead of rendering nothing.
+
+`enabled: true` with an empty (or omitted) `ingress` list denies all inbound traffic to the release's pods.
+
+Sources the chart itself wires to the pods are not allowed automatically: the gateway or ingress
+controller behind `httpRoutes` / `grpcRoutes` / `ingress`, and the scraper behind `global.metrics`,
+need their own rule. A missing source does not fail the rollout — probes come from the node and still
+pass — it only drops that traffic.
 
 `ports[].port` is the container (pod) port, i.e. the Service `targetPort`, not the Service port:
 writing the Service port (80 by default) silently blocks the real traffic.
+A named port resolves to a container port name, which this chart takes from `service.ports[].name`.
 
 ## Contributing
 
