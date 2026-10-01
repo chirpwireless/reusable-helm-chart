@@ -1,0 +1,143 @@
+suite: NetworkPolicy
+templates:
+  - templates/networkpolicy.yaml
+  - templates/deployment.yaml
+release:
+  name: my-svc
+tests:
+  - it: renders nothing with default values
+    asserts:
+      - template: templates/networkpolicy.yaml
+        hasDocuments:
+          count: 0
+
+  - it: selects exactly the Deployment's pods and restricts ingress only
+    values:
+      - ../ci/networkpolicy-values.yaml
+    asserts:
+      - template: templates/networkpolicy.yaml
+        hasDocuments:
+          count: 1
+      - template: templates/networkpolicy.yaml
+        isKind:
+          of: NetworkPolicy
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.policyTypes
+          value:
+            - Ingress
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/name: my-svc
+            app.kubernetes.io/instance: my-svc
+      - template: templates/deployment.yaml
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: my-svc
+            app.kubernetes.io/instance: my-svc
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.ingress
+          value:
+            - from:
+                - podSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: allowed-client
+              ports:
+                - port: 8080
+                  protocol: TCP
+            - from:
+                - namespaceSelector:
+                    matchLabels:
+                      kubernetes.io/metadata.name: allowed-namespace
+                  podSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: allowed-client-in-namespace
+              ports:
+                - port: 9090
+                  protocol: TCP
+            - from:
+                - podSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: allowed-metrics-client
+              ports:
+                - port: metrics
+                  protocol: TCP
+
+  - it: renders an empty ingress list as deny-all
+    values:
+      - ../ci/networkpolicy-denyall-values.yaml
+    asserts:
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.ingress
+          value: []
+
+  - it: refuses a rule without sources, which would allow every source
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - ports:
+              - port: 8080
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "don't meet the specifications of the schema"
+
+  - it: refuses an empty source list
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - from: []
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "don't meet the specifications of the schema"
+
+  - it: refuses an empty source
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - {}
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "don't meet the specifications of the schema"
+
+  - it: refuses a misspelled rule key
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - form:
+              - podSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: client
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "don't meet the specifications of the schema"
+
+  - it: refuses a numeric string port and a lowercase protocol
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - podSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: client
+            ports:
+              - port: "8080"
+                protocol: tcp
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "don't meet the specifications of the schema"

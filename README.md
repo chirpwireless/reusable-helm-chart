@@ -145,3 +145,7 @@ Uses [Conventional Commits](https://www.conventionalcommits.org/) for semantic v
 - `BREAKING CHANGE:` → major bump
 
 Release workflow: merge to `release` branch → semantic-release → GitHub Pages
+
+Template behaviour is covered by [helm-unittest](https://github.com/helm-unittest/helm-unittest) suites in `chart/tests/`
+(Helm 4, plugin 1.1.x): `helm unittest chart`. CI installs the plugin from a sha256-pinned release archive
+(`.github/actions/setup-helm-unittest`).

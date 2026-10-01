@@ -21,5 +21,6 @@
 .idea/
 *.tmproj
 .vscode/
-# ct lint fixtures, not part of the packaged chart
+# ct lint fixtures and unit tests, not part of the packaged chart
 ci/
+tests/

@@ -32,8 +32,11 @@ jobs:
       - name: Run helm template validation
         run: helm template chart --debug
 
-      - name: Assert NetworkPolicy renders only when enabled
-        run: .github/scripts/assert-networkpolicy.sh chart
+      - name: Set up helm-unittest
+        uses: ./.github/actions/setup-helm-unittest
+
+      - name: Run chart unit tests
+        run: helm unittest chart
 
   release:
     needs: lint-test
