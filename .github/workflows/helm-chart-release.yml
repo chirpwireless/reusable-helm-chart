@@ -14,6 +14,8 @@ jobs:
 
       - name: Set up Helm
         uses: azure/setup-helm@v4
+        with:
+          version: v4.3.0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -31,6 +33,12 @@ jobs:
 
       - name: Run helm template validation
         run: helm template chart --debug
+
+      - name: Set up helm-unittest
+        uses: ./.github/actions/setup-helm-unittest
+
+      - name: Run chart unit tests
+        run: helm unittest chart
 
   release:
     needs: lint-test
@@ -55,6 +63,8 @@ jobs:
 
       - name: Set up Helm
         uses: azure/setup-helm@v4
+        with:
+          version: v4.3.0
 
       - name: Semantic versioning
         id: semantic

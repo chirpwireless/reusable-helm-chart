@@ -1,0 +1,433 @@
+suite: NetworkPolicy
+templates:
+  - templates/networkpolicy.yaml
+  - templates/deployment.yaml
+release:
+  name: my-svc
+tests:
+  - it: renders nothing with default values
+    asserts:
+      - template: templates/networkpolicy.yaml
+        hasDocuments:
+          count: 0
+
+  - it: selects exactly the Deployment's pods and restricts ingress only
+    values:
+      - ../ci/networkpolicy-values.yaml
+    asserts:
+      - template: templates/networkpolicy.yaml
+        hasDocuments:
+          count: 1
+      - template: templates/networkpolicy.yaml
+        isKind:
+          of: NetworkPolicy
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.policyTypes
+          value:
+            - Ingress
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/name: my-svc
+            app.kubernetes.io/instance: my-svc
+      - template: templates/deployment.yaml
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: my-svc
+            app.kubernetes.io/instance: my-svc
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.ingress
+          value:
+            - from:
+                - podSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: allowed-client
+              ports:
+                - port: 8080
+                  protocol: TCP
+            - from:
+                - namespaceSelector:
+                    matchLabels:
+                      kubernetes.io/metadata.name: allowed-namespace
+                  podSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: allowed-client-in-namespace
+              ports:
+                - port: 9090
+                  protocol: TCP
+            - from:
+                - podSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: allowed-metrics-client
+              ports:
+                - port: metrics
+                  protocol: TCP
+
+  - it: renders an empty ingress list as deny-all
+    values:
+      - ../ci/networkpolicy-denyall-values.yaml
+    asserts:
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.ingress
+          value: []
+
+  - it: refuses a rule without sources, which would allow every source
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/ingress/0': missing property 'from'"
+
+  - it: refuses an empty source list
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from: []
+          ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/ingress/0/from': minItems"
+
+  - it: refuses an empty source
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - {}
+          ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/ingress/0/from/0': minProperties"
+
+  - it: refuses empty matchLabels, which would select every pod
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - podSelector:
+              matchLabels: {}
+          ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/podSelector/matchLabels': minProperties"
+
+  - it: refuses empty matchExpressions, which would select every namespace
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - namespaceSelector:
+              matchExpressions: []
+          ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/namespaceSelector/matchExpressions': minItems"
+
+  - it: refuses In without values
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - podSelector:
+              matchExpressions:
+              - key: a
+                operator: In
+          ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/matchExpressions/0': missing property 'values'"
+
+  - it: refuses Exists with values
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - podSelector:
+              matchExpressions:
+              - key: a
+                operator: Exists
+                values:
+                - x
+          ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/matchExpressions/0/values': maxItems"
+
+  - it: refuses ipBlock combined with a selector in one source
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - ipBlock:
+              cidr: 10.0.0.0/8
+            podSelector:
+              matchLabels:
+                a: b
+          ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/ingress/0/from/0': maxProperties"
+
+  - it: refuses an ipBlock without a prefix length
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - ipBlock:
+              cidr: 10.0.0.0
+          ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/ipBlock/cidr': '10.0.0.0' does not match pattern"
+
+  - it: refuses an empty port list, which would allow every port
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: client
+          ports: []
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/ingress/0/ports': minItems"
+
+  - it: refuses a port entry without a port
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: client
+          ports:
+          - protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/ingress/0/ports/0': missing property 'port'"
+
+  - it: refuses a port range that starts at a named port
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: client
+          ports:
+          - endPort: 9000
+            port: http
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/ingress/0/ports/0/port': got string, want integer"
+
+  - it: refuses a numeric string port
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: client
+          ports:
+          - port: '8080'
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/ingress/0/ports/0/port': 'oneOf' failed"
+
+  - it: refuses a lowercase protocol
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: client
+          ports:
+          - port: 8080
+            protocol: tcp
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/ingress/0/ports/0/protocol': value must be one of"
+
+  - it: refuses a misspelled networkPolicy key, which would silently render nothing
+    set:
+      networkPolicy:
+        enable: true
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy': additional properties 'enable' not allowed"
+
+  - it: refuses a misspelled rule key
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - form: &id001
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: client
+          from: *id001
+          ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/ingress/0': additional properties 'form' not allowed"
+
+  - it: refuses a misspelled source key
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - podSelectr:
+              matchLabels:
+                a: b
+          ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/ingress/0/from/0': additional properties 'podSelectr' not allowed"
+
+  - it: refuses a misspelled port key
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: client
+          ports:
+          - port: 8080
+            prot: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/ingress/0/ports/0': additional properties 'prot' not allowed"
+
+  - it: accepts an explicit empty podSelector, the Kubernetes form for every pod of the namespace
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - podSelector: {}
+          ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        hasDocuments:
+          count: 1
+
+  - it: accepts a numeric port range
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: client
+          ports:
+          - endPort: 8100
+            port: 8000
+    asserts:
+      - template: templates/networkpolicy.yaml
+        hasDocuments:
+          count: 1
+
+  - it: accepts an ipBlock with exceptions
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - ipBlock:
+              cidr: 10.0.0.0/8
+              except:
+              - 10.1.0.0/16
+          ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        hasDocuments:
+          count: 1
+
+  - it: accepts NotIn with values and a rule without ports
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+        - from:
+          - namespaceSelector:
+              matchExpressions:
+              - key: a
+                operator: NotIn
+                values:
+                - x
+    asserts:
+      - template: templates/networkpolicy.yaml
+        hasDocuments:
+          count: 1

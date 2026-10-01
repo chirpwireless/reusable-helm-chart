@@ -1,0 +1,18 @@
+name: Set up helm-unittest
+description: Install the helm-unittest plugin from a release archive pinned by its sha256
+runs:
+  using: composite
+  steps:
+    # Unpacked straight into the plugin dir: Helm 4 refuses an unsigned plugin install, and the archive already carries the binary.
+    - shell: bash
+      env:
+        VERSION: "1.1.2"
+        SHA256: "de03d6b7ba7683282064702d0b36fbbe812ab2a22691fa3a8b2ce57c2682609c"
+      run: |
+        set -euo pipefail
+        archive="${RUNNER_TEMP}/helm-unittest.tgz"
+        curl -sSfL --retry 3 -o "$archive" "https://github.com/helm-unittest/helm-unittest/releases/download/v${VERSION}/helm-unittest-linux-amd64-${VERSION}.tgz"
+        echo "${SHA256}  ${archive}" | sha256sum -c -
+        dir="$(helm env HELM_PLUGINS)/helm-unittest"
+        mkdir -p "$dir"
+        tar xzf "$archive" -C "$dir"
