@@ -1,3 +1,18 @@
+# [1.17.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.16.0...v1.17.0) (2026-10-05)
+
+
+### Bug Fixes
+
+* cover the enabled NetworkPolicy render path in CI and packaging ([7963822](https://github.com/chirpwireless/reusable-helm-chart/commit/79638223da6e1d774318cf7dac866bd6946dd7ae))
+* harden NetworkPolicy schema and assert rendered policy shape in CI ([e681445](https://github.com/chirpwireless/reusable-helm-chart/commit/e681445fd6779c83b4e0b3b6ad70014916f513a9))
+* **networkpolicy:** close the remaining accidental allow-all shapes in the schema ([9c37d7d](https://github.com/chirpwireless/reusable-helm-chart/commit/9c37d7db5ee5c0757b9df29bfc6ba50f039c2610))
+* **networkpolicy:** reject misspelled or allow-all values and assert the rendered rules ([1f1e29e](https://github.com/chirpwireless/reusable-helm-chart/commit/1f1e29e42888b95f266c807b988d7c003ac25fc9))
+
+
+### Features
+
+* add optional NetworkPolicy template ([1a7b331](https://github.com/chirpwireless/reusable-helm-chart/commit/1a7b33102dde455cb70e9947be3f84b817c87368))
+
 # [1.16.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.15.1...v1.16.0) (2026-04-20)
 
 
