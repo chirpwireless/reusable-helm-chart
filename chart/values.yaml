@@ -852,3 +852,17 @@ tolerations: []
 networkPolicy:
   enabled: false
   ingress: []
+
+# @param podDisruptionBudget PodDisruptionBudget for the application
+# Example:
+# podDisruptionBudget:
+#   enabled: true
+#   minAvailable: 1
+# Note: when enabled, set exactly one of minAvailable or maxUnavailable
+# (integer or percentage); the schema rejects both or neither.
+# The budget limits voluntary disruptions only (node drain, eviction).
+#
+podDisruptionBudget:
+  enabled: false
+  minAvailable: null
+  maxUnavailable: null
