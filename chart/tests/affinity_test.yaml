@@ -1,0 +1,36 @@
+suite: Pod anti-affinity
+templates:
+  - templates/deployment.yaml
+release:
+  name: my-svc
+  namespace: my-ns
+tests:
+  - it: spreads replicas by node first, then by zone
+    asserts:
+      - equal:
+          path: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.topologyKey
+          value: kubernetes.io/hostname
+      - equal:
+          path: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight
+          value: 100
+      - equal:
+          path: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[1].podAffinityTerm.topologyKey
+          value: topology.kubernetes.io/zone
+
+  - it: selects its own pods by the labels the pod template carries
+    asserts:
+      - equal:
+          path: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels
+          value:
+            app.kubernetes.io/name: my-svc
+            app.kubernetes.io/instance: my-svc
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/name: my-svc
+            app.kubernetes.io/instance: my-svc
+
+  - it: never requires a separate node, so replicas above the node count still schedule
+    asserts:
+      - notExists:
+          path: spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution
