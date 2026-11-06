@@ -88,28 +88,15 @@ podAntiAffinity:
     - weight: 100
       podAffinityTerm:
         labelSelector:
-          matchExpressions:
-            - key: app.kubernetes.io/release
-              operator: In
-              values:
-                - "{{ .Release.Name }}"
-            - key: app.kubernetes.io/namespace
-              operator: In
-              values:
-                - "{{ .Release.Namespace }}"
+          matchLabels:
+            {{- include "reusable-helm-chart.selectorLabels" . | nindent 12 }}
+        topologyKey: kubernetes.io/hostname
+    - weight: 50
+      podAffinityTerm:
+        labelSelector:
+          matchLabels:
+            {{- include "reusable-helm-chart.selectorLabels" . | nindent 12 }}
         topologyKey: topology.kubernetes.io/zone
-  requiredDuringSchedulingIgnoredDuringExecution:
-    - labelSelector:
-        matchExpressions:
-          - key: app.kubernetes.io/release
-            operator: In
-            values:
-              - "{{ .Release.Name }}"
-          - key: app.kubernetes.io/namespace
-            operator: In
-            values:
-              - "{{ .Release.Namespace }}"
-      topologyKey: "kubernetes.io/hostname"
 {{- end -}}
 
 {{/*
