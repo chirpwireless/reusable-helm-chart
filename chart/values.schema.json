@@ -3627,6 +3627,69 @@
         }
       ],
       "additionalProperties": false
+    },
+    "podDisruptionBudget": {
+      "type": "object",
+      "description": "PodDisruptionBudget for the application. When enabled, exactly one of minAvailable or maxUnavailable must be set",
+      "required": [],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable PodDisruptionBudget for the application",
+          "required": [],
+          "examples": [true]
+        },
+        "minAvailable": {
+          "type": ["integer", "string", "null"],
+          "minimum": 0,
+          "pattern": "^([0-9]|[1-9][0-9]|100)%$",
+          "default": null,
+          "description": "Pods that must stay available during voluntary disruptions: a non-negative integer or a percentage such as 50%",
+          "required": [],
+          "examples": [1, "50%"]
+        },
+        "maxUnavailable": {
+          "type": ["integer", "string", "null"],
+          "minimum": 0,
+          "pattern": "^([0-9]|[1-9][0-9]|100)%$",
+          "default": null,
+          "description": "Pods that may be unavailable during voluntary disruptions: a non-negative integer or a percentage such as 50%",
+          "required": [],
+          "examples": [1, "25%"]
+        }
+      },
+      "if": {
+        "properties": { "enabled": { "const": true } },
+        "required": ["enabled"]
+      },
+      "then": {
+        "oneOf": [
+          {
+            "required": ["minAvailable"],
+            "properties": {
+              "minAvailable": { "type": ["integer", "string"] },
+              "maxUnavailable": { "type": "null" }
+            }
+          },
+          {
+            "required": ["maxUnavailable"],
+            "properties": {
+              "maxUnavailable": { "type": ["integer", "string"] },
+              "minAvailable": { "type": "null" }
+            }
+          }
+        ]
+      },
+      "examples": [
+        {
+          "podDisruptionBudget": {
+            "enabled": true,
+            "minAvailable": 1
+          }
+        }
+      ],
+      "additionalProperties": false
     }
   },
   "examples": [
@@ -3806,7 +3869,8 @@
       "natsStreamsConsumers": {},
       "nodeSelector": {},
       "tolerations": [],
-      "networkPolicy": { "enabled": false, "ingress": [] }
+      "networkPolicy": { "enabled": false, "ingress": [] },
+      "podDisruptionBudget": { "enabled": false, "minAvailable": null, "maxUnavailable": null }
     }
   ],
   "$defs": {

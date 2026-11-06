@@ -1,0 +1,129 @@
+suite: PodDisruptionBudget
+templates:
+  - templates/pdb.yaml
+  - templates/deployment.yaml
+release:
+  name: my-svc
+tests:
+  - it: renders nothing with default values
+    asserts:
+      - template: templates/pdb.yaml
+        hasDocuments:
+          count: 0
+
+  - it: selects exactly the Deployment's pods with minAvailable
+    values:
+      - ../ci/pdb-values.yaml
+    asserts:
+      - template: templates/pdb.yaml
+        hasDocuments:
+          count: 1
+      - template: templates/pdb.yaml
+        isKind:
+          of: PodDisruptionBudget
+      - template: templates/pdb.yaml
+        equal:
+          path: apiVersion
+          value: policy/v1
+      - template: templates/pdb.yaml
+        equal:
+          path: spec.minAvailable
+          value: 1
+      - template: templates/pdb.yaml
+        notExists:
+          path: spec.maxUnavailable
+      - template: templates/pdb.yaml
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: my-svc
+            app.kubernetes.io/instance: my-svc
+      - template: templates/deployment.yaml
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: my-svc
+            app.kubernetes.io/instance: my-svc
+
+  - it: renders maxUnavailable as a percentage
+    values:
+      - ../ci/pdb-maxunavailable-values.yaml
+    asserts:
+      - template: templates/pdb.yaml
+        equal:
+          path: spec.maxUnavailable
+          value: 25%
+      - template: templates/pdb.yaml
+        notExists:
+          path: spec.minAvailable
+
+  - it: accepts minAvailable 0
+    set:
+      podDisruptionBudget:
+        enabled: true
+        minAvailable: 0
+    asserts:
+      - template: templates/pdb.yaml
+        equal:
+          path: spec.minAvailable
+          value: 0
+
+  - it: refuses an enabled budget with neither field
+    set:
+      podDisruptionBudget:
+        enabled: true
+    asserts:
+      - template: templates/pdb.yaml
+        failedTemplate:
+          errorPattern: "/podDisruptionBudget"
+
+  - it: refuses an enabled budget with both fields
+    set:
+      podDisruptionBudget:
+        enabled: true
+        minAvailable: 1
+        maxUnavailable: 1
+    asserts:
+      - template: templates/pdb.yaml
+        failedTemplate:
+          errorPattern: "/podDisruptionBudget"
+
+  - it: accepts minAvailable with an explicit null maxUnavailable
+    set:
+      podDisruptionBudget:
+        enabled: true
+        minAvailable: 50
+        maxUnavailable: null
+    asserts:
+      - template: templates/pdb.yaml
+        hasDocuments:
+          count: 1
+
+  - it: refuses a string that is not a percentage
+    set:
+      podDisruptionBudget:
+        enabled: true
+        minAvailable: half
+    asserts:
+      - template: templates/pdb.yaml
+        failedTemplate:
+          errorPattern: "/podDisruptionBudget/minAvailable"
+
+  - it: refuses a negative value
+    set:
+      podDisruptionBudget:
+        enabled: true
+        minAvailable: -1
+    asserts:
+      - template: templates/pdb.yaml
+        failedTemplate:
+          errorPattern: "/podDisruptionBudget/minAvailable"
+
+  - it: refuses a misspelled key, which would silently render nothing
+    set:
+      podDisruptionBudget:
+        enable: true
+    asserts:
+      - template: templates/pdb.yaml
+        failedTemplate:
+          errorPattern: "/podDisruptionBudget': additional properties 'enable' not allowed"
