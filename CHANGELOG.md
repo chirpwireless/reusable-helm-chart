@@ -1,3 +1,10 @@
+## [1.17.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.17.0...v1.17.1) (2026-11-14)
+
+
+### Bug Fixes
+
+* **affinity:** select the release's own pods so replicas spread across nodes ([5aab04a](https://github.com/chirpwireless/reusable-helm-chart/commit/5aab04adde74101495c255d5e08a0ec20786428b))
+
 # [1.17.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.16.0...v1.17.0) (2026-10-05)
 
 
