@@ -3617,46 +3617,56 @@
                 "required": [],
                 "minItems": 1,
                 "items": {
-                  "$ref": "#/properties/networkPolicy/properties/ingress/items/properties/from/items",
-                  "if": {
-                    "required": [
-                      "ipBlock"
-                    ],
-                    "properties": {
-                      "ipBlock": {
+                  "allOf": [
+                    {
+                      "$ref": "#/properties/networkPolicy/properties/ingress/items/properties/from/items"
+                    },
+                    {
+                      "if": {
                         "required": [
-                          "cidr"
+                          "ipBlock"
                         ],
                         "properties": {
-                          "cidr": {
-                            "enum": [
-                              "0.0.0.0/0",
-                              "::/0"
-                            ]
+                          "ipBlock": {
+                            "required": [
+                              "cidr"
+                            ],
+                            "properties": {
+                              "cidr": {
+                                "enum": [
+                                  "0.0.0.0/0",
+                                  "::/0"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "ipBlock": {
+                            "required": [
+                              "except"
+                            ],
+                            "properties": {
+                              "except": {
+                                "minItems": 1
+                              }
+                            }
                           }
                         }
                       }
                     }
-                  },
-                  "then": {
-                    "properties": {
-                      "ipBlock": {
-                        "required": [
-                          "except"
-                        ],
-                        "properties": {
-                          "except": {
-                            "minItems": 1
-                          }
-                        }
-                      }
-                    }
-                  }
+                  ]
                 }
               },
               "ports": {
-                "$ref": "#/properties/networkPolicy/properties/ingress/items/properties/ports",
-                "description": "List of allowed destination ports for this rule; a rule without ports allows every port of the destination"
+                "description": "List of allowed destination ports for this rule; a rule without ports allows every port of the destination",
+                "allOf": [
+                  {
+                    "$ref": "#/properties/networkPolicy/properties/ingress/items/properties/ports"
+                  }
+                ]
               }
             }
           }
@@ -3684,7 +3694,6 @@
             }
           }
         }
-  
       },
       "examples": [
         {

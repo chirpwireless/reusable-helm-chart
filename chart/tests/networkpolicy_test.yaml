@@ -636,3 +636,33 @@ tests:
       - template: templates/networkpolicy.yaml
         notExists:
           path: spec.egress[0].ports
+
+  - it: refuses ::/0 without except
+    set:
+      networkPolicy:
+        enabled: true
+        restrictIngress: false
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "::/0"
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/egress/0/to/0/ipBlock': missing property 'except'"
+
+  - it: treats restrictIngress null as the default true
+    values:
+      - ../ci/networkpolicy-values.yaml
+    set:
+      networkPolicy:
+        restrictIngress: null
+    asserts:
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.policyTypes
+          value:
+            - Ingress
+      - template: templates/networkpolicy.yaml
+        exists:
+          path: spec.ingress

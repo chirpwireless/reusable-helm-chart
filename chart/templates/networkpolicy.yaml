@@ -14,13 +14,13 @@ spec:
       {{- include "reusable-helm-chart.selectorLabels" . | nindent 6 }}
       {{- end }}
   policyTypes:
-    {{- if .Values.networkPolicy.restrictIngress }}
+    {{- if ne .Values.networkPolicy.restrictIngress false }}
     - Ingress
     {{- end }}
     {{- if .Values.networkPolicy.egress }}
     - Egress
     {{- end }}
-  {{- if .Values.networkPolicy.restrictIngress }}
+  {{- if ne .Values.networkPolicy.restrictIngress false }}
   ingress:
     {{- toYaml .Values.networkPolicy.ingress | nindent 4 }}
   {{- end }}
