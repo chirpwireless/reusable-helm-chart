@@ -847,8 +847,30 @@ tolerations: []
 #           protocol: TCP
 # Note: enabled: true with an empty ingress list denies all inbound traffic.
 # ports[].port is the container port (Service targetPort), not the Service port.
-# Egress is never restricted by this chart.
+# restrictIngress: true (default) limits inbound traffic to the ingress list; false drops the Ingress type, so inbound
+# traffic is not restricted (ingress must then be empty and egress must be set).
+# egress: optional list of rules (to + optional ports, at least one rule); when set the policy also restricts outbound
+# traffic to them. A rule without ports allows every port of its destination. 0.0.0.0/0 and ::/0 need a non-empty except.
+# podSelector.matchLabels: pods the policy selects; defaults to the chart selector labels.
+# Egress example:
+#   networkPolicy:
+#     enabled: true
+#     restrictIngress: false
+#     podSelector:
+#       matchLabels:
+#         app: my-pod
+#     egress:
+#       - to:
+#           - ipBlock:
+#               cidr: 0.0.0.0/0
+#               except:
+#                 - 10.0.0.0/8
+#         ports:
+#           - port: 8883
+#             protocol: TCP
+# Egress is not restricted unless egress is set.
 #
 networkPolicy:
   enabled: false
+  restrictIngress: true
   ingress: []

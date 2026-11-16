@@ -3309,7 +3309,7 @@
         "enabled": {
           "type": "boolean",
           "default": false,
-          "description": "Enable NetworkPolicy for the application. An empty ingress list with enabled: true denies all inbound traffic; egress is never restricted",
+          "description": "Enable NetworkPolicy for the application. With restrictIngress: true an empty ingress list denies all inbound traffic; egress is restricted only when egress is set",
           "required": [],
           "examples": [
             {
@@ -3598,7 +3598,93 @@
               ]
             }
           ]
+        },
+        "egress": {
+          "type": "array",
+          "description": "List of NetworkPolicy egress rules; when set the policy also restricts outbound traffic to these rules. At least one rule is required: an empty list would deny all outbound traffic",
+          "required": [],
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "to"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "to": {
+                "type": "array",
+                "description": "List of NetworkPolicyPeer destinations allowed by this rule (podSelector, namespaceSelector, ipBlock); at least one is required",
+                "required": [],
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/properties/networkPolicy/properties/ingress/items/properties/from/items",
+                  "if": {
+                    "required": [
+                      "ipBlock"
+                    ],
+                    "properties": {
+                      "ipBlock": {
+                        "required": [
+                          "cidr"
+                        ],
+                        "properties": {
+                          "cidr": {
+                            "enum": [
+                              "0.0.0.0/0",
+                              "::/0"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "ipBlock": {
+                        "required": [
+                          "except"
+                        ],
+                        "properties": {
+                          "except": {
+                            "minItems": 1
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "ports": {
+                "$ref": "#/properties/networkPolicy/properties/ingress/items/properties/ports",
+                "description": "List of allowed destination ports for this rule; a rule without ports allows every port of the destination"
+              }
+            }
+          }
+        },
+        "restrictIngress": {
+          "type": "boolean",
+          "default": true,
+          "description": "When true, enabled: true restricts inbound traffic to the ingress list (an empty list denies all inbound traffic). When false the policy has no Ingress type and inbound traffic is not restricted; ingress must then be empty and egress must be set",
+          "required": []
+        },
+        "podSelector": {
+          "type": "object",
+          "description": "Pod labels the policy selects; defaults to the chart selector labels (app.kubernetes.io/name and app.kubernetes.io/instance)",
+          "required": [
+            "matchLabels"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "matchLabels": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
         }
+  
       },
       "examples": [
         {
@@ -3623,6 +3709,48 @@
                 ]
               }
             ]
+          }
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "enabled",
+              "restrictIngress"
+            ],
+            "properties": {
+              "enabled": {
+                "const": true
+              },
+              "restrictIngress": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "egress"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "restrictIngress"
+            ],
+            "properties": {
+              "restrictIngress": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "ingress": {
+                "maxItems": 0
+              }
+            }
           }
         }
       ],
