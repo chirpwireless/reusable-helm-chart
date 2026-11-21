@@ -431,3 +431,238 @@ tests:
       - template: templates/networkpolicy.yaml
         hasDocuments:
           count: 1
+
+  - it: egress without restrictIngress renders only the Egress type and the given rules
+    values:
+      - ../ci/networkpolicy-egress-values.yaml
+    asserts:
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.policyTypes
+          value:
+            - Egress
+      - template: templates/networkpolicy.yaml
+        notExists:
+          path: spec.ingress
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.egress
+          value:
+            - to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+                    except:
+                      - 10.0.0.0/8
+                      - 192.168.0.0/16
+              ports:
+                - port: 8883
+                  protocol: TCP
+            - to:
+                - namespaceSelector:
+                    matchLabels:
+                      kubernetes.io/metadata.name: kube-system
+                  podSelector:
+                    matchLabels:
+                      k8s-app: kube-dns
+              ports:
+                - port: 53
+                  protocol: UDP
+                - port: 53
+                  protocol: TCP
+
+  - it: podSelector replaces the chart selector labels
+    values:
+      - ../ci/networkpolicy-egress-values.yaml
+    asserts:
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/name: my-bridge
+
+  - it: egress with restrictIngress restricts both directions
+    values:
+      - ../ci/networkpolicy-egress-values.yaml
+    set:
+      networkPolicy:
+        restrictIngress: true
+        ingress:
+          - from:
+              - podSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: client
+            ports:
+              - port: 8080
+                protocol: TCP
+    asserts:
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.policyTypes
+          value:
+            - Ingress
+            - Egress
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.ingress[0].ports[0].port
+          value: 8080
+      - template: templates/networkpolicy.yaml
+        exists:
+          path: spec.egress
+
+  - it: renders no egress section and only the Ingress type without the new fields
+    values:
+      - ../ci/networkpolicy-denyall-values.yaml
+    asserts:
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.policyTypes
+          value:
+            - Ingress
+      - template: templates/networkpolicy.yaml
+        notExists:
+          path: spec.egress
+
+  - it: refuses restrictIngress false without egress, which would leave the policy without types
+    set:
+      networkPolicy:
+        enabled: true
+        restrictIngress: false
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy': missing property 'egress'"
+
+  - it: refuses an empty egress list, which would deny all outbound traffic
+    set:
+      networkPolicy:
+        enabled: true
+        egress: []
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/egress': minItems"
+
+  - it: refuses a non-empty ingress with restrictIngress false
+    values:
+      - ../ci/networkpolicy-egress-values.yaml
+    set:
+      networkPolicy:
+        ingress:
+          - from:
+              - podSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: client
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/ingress': maxItems"
+
+  - it: refuses 0.0.0.0/0 without except
+    set:
+      networkPolicy:
+        enabled: true
+        restrictIngress: false
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: 0.0.0.0/0
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/egress/0/to/0/ipBlock': missing property 'except'"
+
+  - it: refuses ::/0 with an empty except
+    set:
+      networkPolicy:
+        enabled: true
+        restrictIngress: false
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "::/0"
+                  except: []
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/egress/0/to/0/ipBlock/except': minItems"
+
+  - it: refuses an egress rule without to
+    set:
+      networkPolicy:
+        enabled: true
+        restrictIngress: false
+        egress:
+          - ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/egress/0': missing property 'to'"
+
+  - it: refuses an empty destination list
+    set:
+      networkPolicy:
+        enabled: true
+        restrictIngress: false
+        egress:
+          - to: []
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/egress/0/to': minItems"
+
+  - it: refuses an empty podSelector override, which would select every pod
+    set:
+      networkPolicy:
+        enabled: true
+        podSelector:
+          matchLabels: {}
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/podSelector/matchLabels': minProperties"
+
+  - it: accepts a rule without ports
+    set:
+      networkPolicy:
+        enabled: true
+        restrictIngress: false
+        egress:
+          - to:
+              - podSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: db
+    asserts:
+      - template: templates/networkpolicy.yaml
+        notExists:
+          path: spec.egress[0].ports
+
+  - it: refuses ::/0 without except
+    set:
+      networkPolicy:
+        enabled: true
+        restrictIngress: false
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "::/0"
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/egress/0/to/0/ipBlock': missing property 'except'"
+
+  - it: treats restrictIngress null as the default true
+    values:
+      - ../ci/networkpolicy-values.yaml
+    set:
+      networkPolicy:
+        restrictIngress: null
+    asserts:
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.policyTypes
+          value:
+            - Ingress
+      - template: templates/networkpolicy.yaml
+        exists:
+          path: spec.ingress
