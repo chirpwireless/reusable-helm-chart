@@ -10,7 +10,18 @@ spec:
     matchLabels:
       {{- include "reusable-helm-chart.selectorLabels" . | nindent 6 }}
   policyTypes:
+    {{- if ne .Values.networkPolicy.restrictIngress false }}
     - Ingress
+    {{- end }}
+    {{- if .Values.networkPolicy.egress }}
+    - Egress
+    {{- end }}
+  {{- if ne .Values.networkPolicy.restrictIngress false }}
   ingress:
     {{- toYaml .Values.networkPolicy.ingress | nindent 4 }}
+  {{- end }}
+  {{- if .Values.networkPolicy.egress }}
+  egress:
+    {{- toYaml .Values.networkPolicy.egress | nindent 4 }}
+  {{- end }}
 {{- end }}

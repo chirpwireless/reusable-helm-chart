@@ -3309,7 +3309,7 @@
         "enabled": {
           "type": "boolean",
           "default": false,
-          "description": "Enable NetworkPolicy for the application. An empty ingress list with enabled: true denies all inbound traffic; egress is never restricted",
+          "description": "Enable NetworkPolicy for the application. With restrictIngress: true an empty ingress list denies all inbound traffic; egress is restricted only when egress is set",
           "required": [],
           "examples": [
             {
@@ -3598,6 +3598,203 @@
               ]
             }
           ]
+        },
+        "egress": {
+          "type": "array",
+          "description": "List of NetworkPolicy egress rules; when set the policy also restricts outbound traffic to these rules. Unset means outbound traffic is not restricted; an empty list is refused",
+          "required": [],
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "to"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "to": {
+                "type": "array",
+                "description": "List of NetworkPolicyPeer destinations allowed by this rule (podSelector, namespaceSelector, ipBlock); at least one is required",
+                "required": [],
+                "minItems": 1,
+                "items": {
+                  "allOf": [
+                    {
+                      "$ref": "#/properties/networkPolicy/properties/ingress/items/properties/from/items"
+                    },
+                    {
+                      "properties": {
+                        "podSelector": {
+                          "description": "A destination selector must name pods: an empty one selects every pod of the namespace. NotIn and DoesNotExist on a key no pod carries also select all of them",
+                          "minProperties": 1
+                        },
+                        "namespaceSelector": {
+                          "description": "A destination selector must name namespaces: an empty one selects every namespace. NotIn and DoesNotExist on a key no namespace carries also select all of them",
+                          "minProperties": 1
+                        },
+                        "ipBlock": {
+                          "properties": {
+                            "cidr": {
+                              "description": "One address family per destination: dotted IPv4, or IPv6 with groups of at most four hex digits and at most seven colons (write :: for two or more zero groups only), without an embedded IPv4 address and without the IPv4-mapped range (::ffff:…), so every spelling of /0 meets its exception check. Prefixes /1 to /7 are refused: split halves of the whole address space would bypass that check",
+                              "pattern": "^([0-9.]+/[0-9]{1,2}|([0-9A-Fa-f]{0,4}:){2,7}[0-9A-Fa-f]{0,4}/[0-9]{1,3})$",
+                              "allOf": [
+                                { "not": { "pattern": "/0*[1-7]$" } },
+                                { "not": { "pattern": "^(0{0,4}:){1,6}[fF]{4}:" } }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "required": [
+                          "ipBlock"
+                        ],
+                        "properties": {
+                          "ipBlock": {
+                            "required": [
+                              "cidr"
+                            ],
+                            "properties": {
+                              "cidr": {
+                                "pattern": "^[0-9.]+/0+$"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "ipBlock": {
+                            "required": [
+                              "except"
+                            ],
+                            "properties": {
+                              "except": {
+                                "description": "An IPv4 /0 destination must exclude every private, loopback, link-local (cloud metadata) and shared range",
+                                "allOf": [
+                                  { "contains": { "const": "10.0.0.0/8" } },
+                                  { "contains": { "const": "172.16.0.0/12" } },
+                                  { "contains": { "const": "192.168.0.0/16" } },
+                                  { "contains": { "const": "100.64.0.0/10" } },
+                                  { "contains": { "const": "169.254.0.0/16" } },
+                                  { "contains": { "const": "127.0.0.0/8" } }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "required": [
+                          "ipBlock"
+                        ],
+                        "properties": {
+                          "ipBlock": {
+                            "required": [
+                              "cidr"
+                            ],
+                            "properties": {
+                              "cidr": {
+                                "pattern": "^[0-9A-Fa-f:]*:[0-9A-Fa-f:]*/0+$"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "ipBlock": {
+                            "required": [
+                              "except"
+                            ],
+                            "properties": {
+                              "except": {
+                                "description": "An IPv6 /0 destination must exclude the unique-local, link-local, loopback and NAT64 ranges (NAT64 leads to internal IPv4 addresses)",
+                                "allOf": [
+                                  { "contains": { "const": "fc00::/7" } },
+                                  { "contains": { "const": "fe80::/10" } },
+                                  { "contains": { "const": "::1/128" } },
+                                  { "contains": { "const": "64:ff9b::/96" } },
+                                  { "contains": { "const": "64:ff9b:1::/48" } }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "required": [
+                          "ipBlock"
+                        ],
+                        "properties": {
+                          "ipBlock": {
+                            "required": [
+                              "cidr"
+                            ],
+                            "properties": {
+                              "cidr": {
+                                "pattern": "^[0-9.]+/[0-9]+$"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "ipBlock": {
+                            "properties": {
+                              "except": {
+                                "items": {
+                                  "description": "An IPv4 destination takes IPv4 exceptions only",
+                                  "pattern": "^[0-9.]+/[0-9]{1,2}$"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "else": {
+                        "properties": {
+                          "ipBlock": {
+                            "properties": {
+                              "except": {
+                                "items": {
+                                  "description": "An IPv6 destination takes IPv6 exceptions only; IPv4-mapped ranges (::ffff:…) count as IPv4 and Kubernetes refuses them",
+                                  "pattern": "^[0-9A-Fa-f:]+/[0-9]{1,3}$",
+                                  "not": {
+                                    "pattern": "^(0{0,4}:){1,6}[fF]{4}:"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "ports": {
+                "description": "List of allowed destination ports for this rule; a rule without ports allows every port of the destination",
+                "allOf": [
+                  {
+                    "$ref": "#/properties/networkPolicy/properties/ingress/items/properties/ports"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "restrictIngress": {
+          "type": "boolean",
+          "default": true,
+          "description": "When true, enabled: true restricts inbound traffic to the ingress list (an empty list denies all inbound traffic). When false the policy has no Ingress type and inbound traffic is not restricted; ingress must then be empty and egress must be set",
+          "required": []
         }
       },
       "examples": [
@@ -3623,6 +3820,48 @@
                 ]
               }
             ]
+          }
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "enabled",
+              "restrictIngress"
+            ],
+            "properties": {
+              "enabled": {
+                "const": true
+              },
+              "restrictIngress": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "egress"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "restrictIngress"
+            ],
+            "properties": {
+              "restrictIngress": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "ingress": {
+                "maxItems": 0
+              }
+            }
           }
         }
       ],
