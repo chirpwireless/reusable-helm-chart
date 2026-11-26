@@ -467,6 +467,8 @@ tests:
                       - fc00::/7
                       - fe80::/10
                       - ::1/128
+                      - 64:ff9b::/96
+                      - 64:ff9b:1::/48
               ports:
                 - port: 8883
                   protocol: TCP
@@ -482,60 +484,6 @@ tests:
                   protocol: UDP
                 - port: 53
                   protocol: TCP
-
-  - it: podSelector may narrow to a subset of the release's own selector labels
-    values:
-      - ../ci/networkpolicy-egress-values.yaml
-    set:
-      networkPolicy:
-        podSelector:
-          matchLabels:
-            app.kubernetes.io/instance: my-svc
-    asserts:
-      - template: templates/networkpolicy.yaml
-        equal:
-          path: spec.podSelector.matchLabels
-          value:
-            app.kubernetes.io/instance: my-svc
-
-  - it: refuses a podSelector label the release's pods do not carry
-    values:
-      - ../ci/networkpolicy-egress-values.yaml
-    set:
-      networkPolicy:
-        podSelector:
-          matchLabels:
-            app: my-pod
-    asserts:
-      - template: templates/networkpolicy.yaml
-        failedTemplate:
-          errorPattern: "may only keep the release's own selector labels"
-
-  - it: refuses a podSelector that selects pods of another release
-    values:
-      - ../ci/networkpolicy-egress-values.yaml
-    set:
-      networkPolicy:
-        podSelector:
-          matchLabels:
-            app.kubernetes.io/instance: other-svc
-    asserts:
-      - template: templates/networkpolicy.yaml
-        failedTemplate:
-          errorPattern: "may only keep the release's own selector labels"
-
-  - it: refuses a podSelector label with an empty value the release does not carry
-    values:
-      - ../ci/networkpolicy-egress-values.yaml
-    set:
-      networkPolicy:
-        podSelector:
-          matchLabels:
-            team: ""
-    asserts:
-      - template: templates/networkpolicy.yaml
-        failedTemplate:
-          errorPattern: "may only keep the release's own selector labels"
 
   - it: denies all inbound traffic and limits outbound with restrictIngress and an empty ingress
     values:
@@ -689,17 +637,6 @@ tests:
       - template: templates/networkpolicy.yaml
         failedTemplate:
           errorPattern: "/networkPolicy/egress/0/to': minItems"
-
-  - it: refuses an empty podSelector override, which would select every pod
-    set:
-      networkPolicy:
-        enabled: true
-        podSelector:
-          matchLabels: {}
-    asserts:
-      - template: templates/networkpolicy.yaml
-        failedTemplate:
-          errorPattern: "/networkPolicy/podSelector/matchLabels': minProperties"
 
   - it: accepts a rule without ports
     set:
@@ -927,6 +864,8 @@ tests:
                     - "fc00::/7"
                     - "fe80::/10"
                     - "ff00::/8"
+                    - "64:ff9b::/96"
+                    - "64:ff9b:1::/48"
             ports:
               - port: 8883
     asserts:
@@ -994,36 +933,103 @@ tests:
         failedTemplate:
           errorPattern: "/ipBlock/cidr': 'allOf' failed"
 
-  - it: podSelector follows fullnameOverride, the name label the release's pods carry
+  - it: refuses a podSelector override, the policy always selects the release's own pods
     values:
       - ../ci/networkpolicy-egress-values.yaml
     set:
-      fullnameOverride: bridge
       networkPolicy:
         podSelector:
           matchLabels:
-            app.kubernetes.io/name: bridge
-    asserts:
-      - template: templates/networkpolicy.yaml
-        equal:
-          path: spec.podSelector.matchLabels
-          value:
-            app.kubernetes.io/name: bridge
-      - template: templates/deployment.yaml
-        equal:
-          path: spec.template.metadata.labels["app.kubernetes.io/name"]
-          value: bridge
-
-  - it: refuses the release name as the name label under fullnameOverride
-    values:
-      - ../ci/networkpolicy-egress-values.yaml
-    set:
-      fullnameOverride: bridge
-      networkPolicy:
-        podSelector:
-          matchLabels:
-            app.kubernetes.io/name: my-svc
+            app.kubernetes.io/instance: my-svc
     asserts:
       - template: templates/networkpolicy.yaml
         failedTemplate:
-          errorPattern: "may only keep the release's own selector labels"
+          errorPattern: "additional properties 'podSelector' not allowed"
+
+  - it: accepts an internal /32 destination
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "10.128.255.14/32"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        hasDocuments:
+          count: 1
+
+  - it: accepts an IPv6 destination with an IPv6 exception
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "2001:db8::/32"
+                  except:
+                    - "2001:db8:1::/48"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        hasDocuments:
+          count: 1
+
+  - it: refuses an IPv4 exception under ::/0
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "::/0"
+                  except:
+                    - "fc00::/7"
+                    - "fe80::/10"
+                    - "::1/128"
+                    - "64:ff9b::/96"
+                    - "64:ff9b:1::/48"
+                    - "10.0.0.0/8"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "'10.0.0.0/8' does not match pattern"
+
+  - it: refuses an IPv6 /1 half of the address space
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "8000::/1"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/ipBlock/cidr': 'allOf' failed"
+
+  - it: refuses ::/0 without the NAT64 exceptions
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "::/0"
+                  except:
+                    - "fc00::/7"
+                    - "fe80::/10"
+                    - "::1/128"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "value must be '64:ff9b::/96'"

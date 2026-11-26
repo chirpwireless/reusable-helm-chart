@@ -1,12 +1,4 @@
 {{- if .Values.networkPolicy.enabled -}}
-{{- if .Values.networkPolicy.podSelector }}
-{{- $own := include "reusable-helm-chart.selectorLabels" . | fromYaml }}
-{{- range $key, $value := .Values.networkPolicy.podSelector.matchLabels }}
-{{- if or (not (hasKey $own $key)) (ne (get $own $key | toString) (toString $value)) }}
-{{- fail (printf "networkPolicy.podSelector.matchLabels may only keep the release's own selector labels %v; %s: %s would leave its pods unprotected or select pods of another release" $own $key $value) }}
-{{- end }}
-{{- end }}
-{{- end -}}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -16,11 +8,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      {{- if .Values.networkPolicy.podSelector }}
-      {{- toYaml .Values.networkPolicy.podSelector.matchLabels | nindent 6 }}
-      {{- else }}
       {{- include "reusable-helm-chart.selectorLabels" . | nindent 6 }}
-      {{- end }}
   policyTypes:
     {{- if ne .Values.networkPolicy.restrictIngress false }}
     - Ingress

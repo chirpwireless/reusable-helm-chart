@@ -148,6 +148,10 @@ controller behind `httpRoutes` / `grpcRoutes` / `ingress`, and the scraper behin
 need their own rule. A missing source does not fail the rollout — probes come from the node and still
 pass — it only drops that traffic.
 
+Ingress `ports[].port` is the container (pod) port, i.e. the Service `targetPort`, not the Service port:
+writing the Service port (80 by default) silently blocks the real traffic.
+A named port resolves to a container port name, which this chart takes from `service.ports[].name`.
+
 ### Egress
 
 `egress` (optional, at least one rule) limits outbound traffic to its rules; without it outbound
@@ -157,25 +161,20 @@ The schema refuses the destinations that would open internal addresses by accide
 - an empty `podSelector` or `namespaceSelector` destination (every pod, every namespace);
 - `0.0.0.0/0` (in any spelling of `/0`) unless `except` lists `10.0.0.0/8`, `172.16.0.0/12`,
   `192.168.0.0/16`, `100.64.0.0/10`, `169.254.0.0/16` (cloud metadata) and `127.0.0.0/8`; `::/0` unless it
-  lists `fc00::/7`, `fe80::/10` and `::1/128`;
+  lists `fc00::/7`, `fe80::/10`, `::1/128`, `64:ff9b::/96` and `64:ff9b:1::/48` (NAT64);
 - prefixes `/1`–`/7`, which would cover the whole address space in halves;
-- exceptions of the other address family, and IPv4-mapped IPv6 ranges (`::ffff:…`), which Kubernetes rejects.
+- IPv6 destinations with an embedded IPv4 address or in the IPv4-mapped range (`::ffff:…`), exceptions of the
+  other address family, and IPv4-mapped exceptions (Kubernetes rejects those under `::/0`).
 
 These are the minimum, and the schema does not compute CIDR containment: a destination such as
-`169.0.0.0/8` or `::/8` that covers an internal range is accepted without exceptions. Addresses the workload must not reach that are public (the platform's own load
-balancers and NAT gateways) are the release's own exceptions. Name resolution needs its own rule to
-kube-dns on port 53.
+`169.0.0.0/8` or `::/8` that covers an internal range is accepted without exceptions, and so is a selector
+expression (`NotIn`, `DoesNotExist`, `Exists`) that matches every pod or namespace. Public addresses the
+workload must not reach (the platform's own load balancers and NAT gateways) are the release's own
+exceptions. Name resolution needs its own rule to kube-dns on port 53. The policy also covers the database-migration hook pod of the release: with `egress`
+set and `dbMigration` enabled, add a rule to the database or the hook fails the upgrade.
 
 `restrictIngress: false` drops the Ingress type, so inbound traffic is not restricted; `ingress` must then
 be empty and `egress` set. To deny all inbound traffic keep `restrictIngress: true` with `ingress: []`.
-
-`podSelector.matchLabels` replaces the selected labels, but only with a subset of the chart selector
-labels and their values (for example only `app.kubernetes.io/instance`): the policy keeps covering the
-release's own pods and never selects pods of another release.
-
-`ports[].port` is the container (pod) port, i.e. the Service `targetPort`, not the Service port:
-writing the Service port (80 by default) silently blocks the real traffic.
-A named port resolves to a container port name, which this chart takes from `service.ports[].name`.
 
 ## Contributing
 
