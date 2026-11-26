@@ -1,3 +1,18 @@
+# [1.18.0](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.17.1...v1.18.0) (2026-11-26)
+
+
+### Bug Fixes
+
+* **networkpolicy:** drop the podSelector override, require NAT64 exceptions under ::/0 ([e8f29be](https://github.com/chirpwireless/reusable-helm-chart/commit/e8f29be5d2d9d1c3c1543e89b5d9b1e707f20851))
+* **networkpolicy:** one address family per egress destination, no IPv4-mapped destinations ([7b89a20](https://github.com/chirpwireless/reusable-helm-chart/commit/7b89a206d003b2c6dd30ab5ef0f63a8cbfed5a07))
+* **networkpolicy:** refuse egress destinations that open internal addresses ([6cb6310](https://github.com/chirpwireless/reusable-helm-chart/commit/6cb6310c7912783df0f54312cf60693c75f092ce))
+* **networkpolicy:** validate 0.0.0.0/0 except on Helm 3, treat null restrictIngress as default ([df22489](https://github.com/chirpwireless/reusable-helm-chart/commit/df22489dd6cadb92ee822c3ba4b453b532d844ed))
+
+
+### Features
+
+* **networkpolicy:** add egress rules, restrictIngress and podSelector ([0c6ede6](https://github.com/chirpwireless/reusable-helm-chart/commit/0c6ede698166a46a4b96c379046e9a2b43cae188))
+
 ## [1.17.1](https://github.com/chirpwireless/reusable-helm-chart/compare/v1.17.0...v1.17.1) (2026-11-14)
 
 
