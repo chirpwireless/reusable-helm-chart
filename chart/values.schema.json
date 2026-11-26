@@ -3624,7 +3624,7 @@
                     {
                       "properties": {
                         "podSelector": {
-                          "description": "A destination selector must name pods: an empty one selects every pod of the namespace",
+                          "description": "A destination selector must name pods: an empty one selects every pod of the namespace. NotIn and DoesNotExist on a key no pod carries also select all of them",
                           "minProperties": 1
                         },
                         "namespaceSelector": {
@@ -3634,10 +3634,12 @@
                         "ipBlock": {
                           "properties": {
                             "cidr": {
-                              "description": "Prefixes /1 to /7 are refused: split halves of the whole address space would bypass the internal-range check of /0",
-                              "not": {
-                                "pattern": "/0*[1-7]$"
-                              }
+                              "description": "One address family per destination: dotted IPv4, or IPv6 without an embedded IPv4 address and without the IPv4-mapped range (::ffff:…), so every spelling of /0 meets its exception check. Prefixes /1 to /7 are refused: split halves of the whole address space would bypass that check",
+                              "pattern": "^([0-9.]+/[0-9]{1,2}|[0-9A-Fa-f:]+/[0-9]{1,3})$",
+                              "allOf": [
+                                { "not": { "pattern": "/0*[1-7]$" } },
+                                { "not": { "pattern": "^(0{0,4}:){1,6}[fF]{4}:" } }
+                              ]
                             }
                           }
                         }

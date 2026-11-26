@@ -948,3 +948,48 @@ tests:
       - template: templates/networkpolicy.yaml
         hasDocuments:
           count: 1
+
+  - it: refuses an IPv6 /0 written with an embedded IPv4 address
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "::0.0.0.0/0"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "'::0.0.0.0/0' does not match pattern"
+
+  - it: refuses an IPv4-mapped /0 destination
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "::ffff:0.0.0.0/0"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "'::ffff:0.0.0.0/0' does not match pattern"
+
+  - it: refuses the IPv4-mapped range as a destination
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "::ffff:0:0/96"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/ipBlock/cidr': 'allOf' failed"

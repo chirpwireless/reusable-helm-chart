@@ -879,7 +879,6 @@ tolerations: []
 #             protocol: UDP
 #           - port: 53
 #             protocol: TCP
-# Egress is not restricted unless egress is set.
 #
 networkPolicy:
   enabled: false

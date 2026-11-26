@@ -114,7 +114,7 @@ natsStreamsConsumers:
 
 Disabled by default, so existing consumers of the chart are unaffected. When enabled, the chart
 renders a `NetworkPolicy` scoped to the release's own pods (`podSelector` matches the chart's
-selector labels) that restricts ingress, and egress too when `egress` is set.
+selector labels). It restricts ingress unless `restrictIngress: false`, and egress when `egress` is set.
 
 ```yaml
 networkPolicy:
@@ -161,7 +161,8 @@ The schema refuses the destinations that would open internal addresses by accide
 - prefixes `/1`–`/7`, which would cover the whole address space in halves;
 - exceptions of the other address family, and IPv4-mapped IPv6 ranges (`::ffff:…`), which Kubernetes rejects.
 
-These are the minimum. Addresses the workload must not reach that are public (the platform's own load
+These are the minimum, and the schema does not compute CIDR containment: a destination such as
+`169.0.0.0/8` or `::/8` that covers an internal range is accepted without exceptions. Addresses the workload must not reach that are public (the platform's own load
 balancers and NAT gateways) are the release's own exceptions. Name resolution needs its own rule to
 kube-dns on port 53.
 
