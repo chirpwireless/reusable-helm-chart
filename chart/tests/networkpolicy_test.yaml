@@ -993,3 +993,37 @@ tests:
       - template: templates/networkpolicy.yaml
         failedTemplate:
           errorPattern: "/ipBlock/cidr': 'allOf' failed"
+
+  - it: podSelector follows fullnameOverride, the name label the release's pods carry
+    values:
+      - ../ci/networkpolicy-egress-values.yaml
+    set:
+      fullnameOverride: bridge
+      networkPolicy:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: bridge
+    asserts:
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/name: bridge
+      - template: templates/deployment.yaml
+        equal:
+          path: spec.template.metadata.labels["app.kubernetes.io/name"]
+          value: bridge
+
+  - it: refuses the release name as the name label under fullnameOverride
+    values:
+      - ../ci/networkpolicy-egress-values.yaml
+    set:
+      fullnameOverride: bridge
+      networkPolicy:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: my-svc
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "may only keep the release's own selector labels"
