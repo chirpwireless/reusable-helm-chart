@@ -852,7 +852,7 @@ tolerations: []
 # egress: optional list of rules (to + optional ports, at least one rule); when set the policy also restricts outbound
 # traffic to them. A rule without ports allows every port of its destination. Destination selectors must not be empty.
 # 0.0.0.0/0 must except 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 100.64.0.0/10, 169.254.0.0/16 and 127.0.0.0/8;
-# ::/0 must except fc00::/7, fe80::/10 and ::1/128; prefixes /1-/7 are refused. DNS needs its own rule to kube-dns.
+# ::/0 must except fc00::/7, fe80::/10, ::1/128, 64:ff9b::/96 and 64:ff9b:1::/48; prefixes /1-/7 are refused. DNS needs its own rule to kube-dns.
 # Egress example (internet on MQTT ports only, no inbound traffic):
 #   networkPolicy:
 #     enabled: true

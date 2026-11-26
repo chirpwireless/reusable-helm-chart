@@ -171,7 +171,8 @@ These are the minimum, and the schema does not compute CIDR containment: a desti
 expression (`NotIn`, `DoesNotExist`, `Exists`) that matches every pod or namespace. Public addresses the
 workload must not reach (the platform's own load balancers and NAT gateways) are the release's own
 exceptions. Name resolution needs its own rule to kube-dns on port 53. The policy also covers the database-migration hook pod of the release: with `egress`
-set and `dbMigration` enabled, add a rule to the database or the hook fails the upgrade.
+set and `dbMigration` enabled, add a rule to the database or the hook fails the upgrade. CronJob pods carry no
+selector labels, so the policy does not cover them.
 
 `restrictIngress: false` drops the Ingress type, so inbound traffic is not restricted; `ingress` must then
 be empty and `egress` set. To deny all inbound traffic keep `restrictIngress: true` with `ingress: []`.
