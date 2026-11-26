@@ -435,6 +435,9 @@ tests:
   - it: egress without restrictIngress renders only the Egress type and the given rules
     values:
       - ../ci/networkpolicy-egress-values.yaml
+    set:
+      networkPolicy:
+        restrictIngress: false
     asserts:
       - template: templates/networkpolicy.yaml
         equal:
@@ -453,7 +456,17 @@ tests:
                     cidr: 0.0.0.0/0
                     except:
                       - 10.0.0.0/8
+                      - 172.16.0.0/12
                       - 192.168.0.0/16
+                      - 100.64.0.0/10
+                      - 169.254.0.0/16
+                      - 127.0.0.0/8
+                - ipBlock:
+                    cidr: "::/0"
+                    except:
+                      - fc00::/7
+                      - fe80::/10
+                      - ::1/128
               ports:
                 - port: 8883
                   protocol: TCP
@@ -470,15 +483,80 @@ tests:
                 - port: 53
                   protocol: TCP
 
-  - it: podSelector replaces the chart selector labels
+  - it: podSelector may narrow to a subset of the release's own selector labels
     values:
       - ../ci/networkpolicy-egress-values.yaml
+    set:
+      networkPolicy:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/instance: my-svc
     asserts:
       - template: templates/networkpolicy.yaml
         equal:
           path: spec.podSelector.matchLabels
           value:
-            app.kubernetes.io/name: my-bridge
+            app.kubernetes.io/instance: my-svc
+
+  - it: refuses a podSelector label the release's pods do not carry
+    values:
+      - ../ci/networkpolicy-egress-values.yaml
+    set:
+      networkPolicy:
+        podSelector:
+          matchLabels:
+            app: my-pod
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "may only keep the release's own selector labels"
+
+  - it: refuses a podSelector that selects pods of another release
+    values:
+      - ../ci/networkpolicy-egress-values.yaml
+    set:
+      networkPolicy:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/instance: other-svc
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "may only keep the release's own selector labels"
+
+  - it: refuses a podSelector label with an empty value the release does not carry
+    values:
+      - ../ci/networkpolicy-egress-values.yaml
+    set:
+      networkPolicy:
+        podSelector:
+          matchLabels:
+            team: ""
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "may only keep the release's own selector labels"
+
+  - it: denies all inbound traffic and limits outbound with restrictIngress and an empty ingress
+    values:
+      - ../ci/networkpolicy-egress-values.yaml
+    asserts:
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.policyTypes
+          value:
+            - Ingress
+            - Egress
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.ingress
+          value: []
+      - template: templates/networkpolicy.yaml
+        equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/name: my-svc
+            app.kubernetes.io/instance: my-svc
 
   - it: egress with restrictIngress restricts both directions
     values:
@@ -547,6 +625,7 @@ tests:
       - ../ci/networkpolicy-egress-values.yaml
     set:
       networkPolicy:
+        restrictIngress: false
         ingress:
           - from:
               - podSelector:
@@ -584,7 +663,7 @@ tests:
     asserts:
       - template: templates/networkpolicy.yaml
         failedTemplate:
-          errorPattern: "/networkPolicy/egress/0/to/0/ipBlock/except': minItems"
+          errorPattern: "/networkPolicy/egress/0/to/0/ipBlock/except': 'allOf' failed"
 
   - it: refuses an egress rule without to
     set:
@@ -666,3 +745,206 @@ tests:
       - template: templates/networkpolicy.yaml
         exists:
           path: spec.ingress
+
+  - it: refuses two /1 halves that cover the whole IPv4 space
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "0.0.0.0/1"
+              - ipBlock:
+                  cidr: "128.0.0.0/1"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/egress/0/to/0/ipBlock/cidr': 'not' failed"
+
+  - it: refuses a /0 written with a host address and no internal exceptions
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "10.0.0.0/0"
+                  except:
+                    - "203.0.113.0/24"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "value must be '169.254.0.0/16'"
+
+  - it: refuses 0.0.0.0/00 without except
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "0.0.0.0/00"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/networkPolicy/egress/0/to/0/ipBlock': missing property 'except'"
+
+  - it: refuses 0.0.0.0/0 when a private range is missing from except
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "0.0.0.0/0"
+                  except:
+                    - "10.0.0.0/8"
+                    - "172.16.0.0/12"
+                    - "192.168.0.0/16"
+                    - "100.64.0.0/10"
+                    - "127.0.0.0/8"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "value must be '169.254.0.0/16'"
+
+  - it: refuses 0::/0 without the IPv6 internal exceptions
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "0::/0"
+                  except:
+                    - "2001:db8::/32"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "value must be 'fe80::/10'"
+
+  - it: refuses an IPv4-mapped exception under ::/0, which Kubernetes rejects
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "::/0"
+                  except:
+                    - "fc00::/7"
+                    - "fe80::/10"
+                    - "::1/128"
+                    - "::ffff:0:0/96"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/ipBlock/except/3': 'not' failed"
+
+  - it: refuses an IPv6 exception under an IPv4 destination
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "0.0.0.0/0"
+                  except:
+                    - "10.0.0.0/8"
+                    - "172.16.0.0/12"
+                    - "192.168.0.0/16"
+                    - "100.64.0.0/10"
+                    - "169.254.0.0/16"
+                    - "127.0.0.0/8"
+                    - "fc00::/7"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "'fc00::/7' does not match pattern"
+
+  - it: refuses an empty podSelector destination, which selects every pod of the namespace
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - podSelector: {}
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/to/0/podSelector': minProperties"
+
+  - it: refuses an empty namespaceSelector destination, which selects every namespace
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - namespaceSelector: {}
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        failedTemplate:
+          errorPattern: "/to/0/namespaceSelector': minProperties"
+
+  - it: accepts 0.0.0.0/0 and ::/0 with every internal exception
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "0.0.0.0/0"
+                  except:
+                    - "10.0.0.0/8"
+                    - "172.16.0.0/12"
+                    - "192.168.0.0/16"
+                    - "100.64.0.0/10"
+                    - "169.254.0.0/16"
+                    - "127.0.0.0/8"
+                    - "198.18.0.0/15"
+              - ipBlock:
+                  cidr: "::/0"
+                  except:
+                    - "::1/128"
+                    - "fc00::/7"
+                    - "fe80::/10"
+                    - "ff00::/8"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        hasDocuments:
+          count: 1
+
+  - it: accepts a public /8 destination without exceptions
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: "8.0.0.0/8"
+            ports:
+              - port: 8883
+    asserts:
+      - template: templates/networkpolicy.yaml
+        hasDocuments:
+          count: 1

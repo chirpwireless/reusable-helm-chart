@@ -850,23 +850,34 @@ tolerations: []
 # restrictIngress: true (default) limits inbound traffic to the ingress list; false drops the Ingress type, so inbound
 # traffic is not restricted (ingress must then be empty and egress must be set).
 # egress: optional list of rules (to + optional ports, at least one rule); when set the policy also restricts outbound
-# traffic to them. A rule without ports allows every port of its destination. 0.0.0.0/0 and ::/0 need a non-empty except.
-# podSelector.matchLabels: pods the policy selects; defaults to the chart selector labels.
-# Egress example:
+# traffic to them. A rule without ports allows every port of its destination. Destination selectors must not be empty.
+# 0.0.0.0/0 must except 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 100.64.0.0/10, 169.254.0.0/16 and 127.0.0.0/8;
+# ::/0 must except fc00::/7, fe80::/10 and ::1/128; prefixes /1-/7 are refused. DNS needs its own rule to kube-dns.
+# podSelector.matchLabels: pods the policy selects; only a subset of the chart selector labels (the default) is accepted.
+# Egress example (internet on MQTT ports only, no inbound traffic):
 #   networkPolicy:
 #     enabled: true
-#     restrictIngress: false
-#     podSelector:
-#       matchLabels:
-#         app: my-pod
+#     restrictIngress: true
+#     ingress: []
 #     egress:
 #       - to:
 #           - ipBlock:
 #               cidr: 0.0.0.0/0
-#               except:
-#                 - 10.0.0.0/8
+#               except: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 100.64.0.0/10, 169.254.0.0/16, 127.0.0.0/8]
 #         ports:
 #           - port: 8883
+#             protocol: TCP
+#       - to:
+#           - namespaceSelector:
+#               matchLabels:
+#                 kubernetes.io/metadata.name: kube-system
+#             podSelector:
+#               matchLabels:
+#                 k8s-app: kube-dns
+#         ports:
+#           - port: 53
+#             protocol: UDP
+#           - port: 53
 #             protocol: TCP
 # Egress is not restricted unless egress is set.
 #

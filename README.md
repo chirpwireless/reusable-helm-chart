@@ -114,7 +114,7 @@ natsStreamsConsumers:
 
 Disabled by default, so existing consumers of the chart are unaffected. When enabled, the chart
 renders a `NetworkPolicy` scoped to the release's own pods (`podSelector` matches the chart's
-selector labels), restricting only ingress — egress is never limited by this chart.
+selector labels) that restricts ingress, and egress too when `egress` is set.
 
 ```yaml
 networkPolicy:
@@ -147,6 +147,30 @@ Sources the chart itself wires to the pods are not allowed automatically: the ga
 controller behind `httpRoutes` / `grpcRoutes` / `ingress`, and the scraper behind `global.metrics`,
 need their own rule. A missing source does not fail the rollout — probes come from the node and still
 pass — it only drops that traffic.
+
+### Egress
+
+`egress` (optional, at least one rule) limits outbound traffic to its rules; without it outbound
+traffic is not restricted. Each rule needs a non-empty `to`; `ports` is optional (none = every port).
+The schema refuses the destinations that would open internal addresses by accident:
+
+- an empty `podSelector` or `namespaceSelector` destination (every pod, every namespace);
+- `0.0.0.0/0` (in any spelling of `/0`) unless `except` lists `10.0.0.0/8`, `172.16.0.0/12`,
+  `192.168.0.0/16`, `100.64.0.0/10`, `169.254.0.0/16` (cloud metadata) and `127.0.0.0/8`; `::/0` unless it
+  lists `fc00::/7`, `fe80::/10` and `::1/128`;
+- prefixes `/1`–`/7`, which would cover the whole address space in halves;
+- exceptions of the other address family, and IPv4-mapped IPv6 ranges (`::ffff:…`), which Kubernetes rejects.
+
+These are the minimum. Addresses the workload must not reach that are public (the platform's own load
+balancers and NAT gateways) are the release's own exceptions. Name resolution needs its own rule to
+kube-dns on port 53.
+
+`restrictIngress: false` drops the Ingress type, so inbound traffic is not restricted; `ingress` must then
+be empty and `egress` set. To deny all inbound traffic keep `restrictIngress: true` with `ingress: []`.
+
+`podSelector.matchLabels` replaces the selected labels, but only with a subset of the chart selector
+labels and their values (for example only `app.kubernetes.io/instance`): the policy keeps covering the
+release's own pods and never selects pods of another release.
 
 `ports[].port` is the container (pod) port, i.e. the Service `targetPort`, not the Service port:
 writing the Service port (80 by default) silently blocks the real traffic.

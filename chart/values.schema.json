@@ -3601,7 +3601,7 @@
         },
         "egress": {
           "type": "array",
-          "description": "List of NetworkPolicy egress rules; when set the policy also restricts outbound traffic to these rules. At least one rule is required: an empty list would deny all outbound traffic",
+          "description": "List of NetworkPolicy egress rules; when set the policy also restricts outbound traffic to these rules. Unset means outbound traffic is not restricted; an empty list is refused",
           "required": [],
           "minItems": 1,
           "items": {
@@ -3622,6 +3622,28 @@
                       "$ref": "#/properties/networkPolicy/properties/ingress/items/properties/from/items"
                     },
                     {
+                      "properties": {
+                        "podSelector": {
+                          "description": "A destination selector must name pods: an empty one selects every pod of the namespace",
+                          "minProperties": 1
+                        },
+                        "namespaceSelector": {
+                          "description": "A destination selector must name namespaces: an empty one selects every namespace. NotIn and DoesNotExist on a key no namespace carries also select all of them",
+                          "minProperties": 1
+                        },
+                        "ipBlock": {
+                          "properties": {
+                            "cidr": {
+                              "description": "Prefixes /1 to /7 are refused: split halves of the whole address space would bypass the internal-range check of /0",
+                              "not": {
+                                "pattern": "/0*[1-7]$"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
                       "if": {
                         "required": [
                           "ipBlock"
@@ -3633,10 +3655,7 @@
                             ],
                             "properties": {
                               "cidr": {
-                                "enum": [
-                                  "0.0.0.0/0",
-                                  "::/0"
-                                ]
+                                "pattern": "^[0-9.]+/0+$"
                               }
                             }
                           }
@@ -3650,7 +3669,103 @@
                             ],
                             "properties": {
                               "except": {
-                                "minItems": 1
+                                "description": "An IPv4 /0 destination must exclude every private, loopback, link-local (cloud metadata) and shared range",
+                                "allOf": [
+                                  { "contains": { "const": "10.0.0.0/8" } },
+                                  { "contains": { "const": "172.16.0.0/12" } },
+                                  { "contains": { "const": "192.168.0.0/16" } },
+                                  { "contains": { "const": "100.64.0.0/10" } },
+                                  { "contains": { "const": "169.254.0.0/16" } },
+                                  { "contains": { "const": "127.0.0.0/8" } }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "required": [
+                          "ipBlock"
+                        ],
+                        "properties": {
+                          "ipBlock": {
+                            "required": [
+                              "cidr"
+                            ],
+                            "properties": {
+                              "cidr": {
+                                "pattern": "^[0-9A-Fa-f:]*:[0-9A-Fa-f:]*/0+$"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "ipBlock": {
+                            "required": [
+                              "except"
+                            ],
+                            "properties": {
+                              "except": {
+                                "description": "An IPv6 /0 destination must exclude the unique-local, link-local and loopback ranges",
+                                "allOf": [
+                                  { "contains": { "const": "fc00::/7" } },
+                                  { "contains": { "const": "fe80::/10" } },
+                                  { "contains": { "const": "::1/128" } }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "required": [
+                          "ipBlock"
+                        ],
+                        "properties": {
+                          "ipBlock": {
+                            "required": [
+                              "cidr"
+                            ],
+                            "properties": {
+                              "cidr": {
+                                "pattern": "^[0-9.]+/[0-9]+$"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "ipBlock": {
+                            "properties": {
+                              "except": {
+                                "items": {
+                                  "description": "An IPv4 destination takes IPv4 exceptions only",
+                                  "pattern": "^[0-9.]+/[0-9]{1,2}$"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "else": {
+                        "properties": {
+                          "ipBlock": {
+                            "properties": {
+                              "except": {
+                                "items": {
+                                  "description": "An IPv6 destination takes IPv6 exceptions only; IPv4-mapped ranges (::ffff:…) count as IPv4 and Kubernetes refuses them",
+                                  "pattern": "^[0-9A-Fa-f:]+/[0-9]{1,3}$",
+                                  "not": {
+                                    "pattern": "^(0{0,4}:){1,6}[fF]{4}:"
+                                  }
+                                }
                               }
                             }
                           }
@@ -3679,7 +3794,7 @@
         },
         "podSelector": {
           "type": "object",
-          "description": "Pod labels the policy selects; defaults to the chart selector labels (app.kubernetes.io/name and app.kubernetes.io/instance)",
+          "description": "Pod labels the policy selects; defaults to the chart selector labels (app.kubernetes.io/name and app.kubernetes.io/instance). Only a subset of those labels with the same values is accepted, so the policy always covers the release's own pods and no other release",
           "required": [
             "matchLabels"
           ],
